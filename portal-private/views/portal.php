@@ -1579,7 +1579,7 @@ a.db-kpi:hover{transform:translateY(-3px);box-shadow:var(--sh2);border-color:var
 <script src="/assets/vendor/xlsx.full.min.js" defer></script>
 <script src="/assets/vendor/qrcode.min.js" defer></script>
 <style id="pisco-css">
-/* ===== Portal Web IESTP CHINCHA 2026: módulos del informe N.º 009-2026 ===== */
+/* ===== Portal Web IESTP NASCA 2026: módulos del informe N.º 009-2026 ===== */
 .pz-h2{font-size:18px;margin:18px 0 10px;color:var(--hc)}
 .pz-h2row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .pz-orange{background:var(--gold)!important;color:var(--navy)!important;border-color:var(--gold)!important}
@@ -2164,7 +2164,7 @@ tr.pz-bad td{background:var(--errbg)}
 function IX_FACTORY(HOST){
 "use strict";
 /* =====================================================================
-   INTRANET INSTITUCIONAL IESTP CHINCHA — PORTAL WEB 2026
+   INTRANET INSTITUCIONAL IESTP NASCA — PORTAL WEB 2026
    Núcleo: almacenamiento, datos de demostración, utilidades, CRUD,
    documentos (PDF con QR de verificación) y exportaciones (Excel/PDF).
    ===================================================================== */
@@ -2278,7 +2278,7 @@ const PALETAS = [
   ["ica","Verde institucional","Verde institucional y dorado.",{bg:"#f3f6f5",side:"#0b2b28",brand:"#0f5e57",acc:"#c08424"}],
   ["nazca","Granate Nazca","Granate y ocre, inspirado en la región Ica.",{bg:"#f7f4f3",side:"#2a0b10",brand:"#8a1c2b",acc:"#c8902e"}],
   ["pacifico","Azul Pacífico","Azul marino y turquesa, sobrio y formal.",{bg:"#f3f5f9",side:"#0b1a33",brand:"#1d4f9c",acc:"#0ea5b7"}],
-  ["web","Web institucional","Colores del portal institucional www.iestpchincha.edu.pe. Puede ajustarlos abajo.",null]];
+  ["web","Web institucional","Colores del portal institucional istpnasca.edu.pe. Puede ajustarlos abajo.",null]];
 const WEB_DEF = {brand:"#ff4f01", acc:"#ff8c01", side:"#131d3b"};
 const HEX = /^#[0-9a-f]{6}$/i;
 const inkFor = hex => { const n = parseInt(hex.slice(1),16), c = [n>>16&255, n>>8&255, n&255].map(v => { v /= 255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4) }); return (.2126*c[0] + .7152*c[1] + .0722*c[2]) > .45 ? "#111111" : "#ffffff" };
@@ -2559,7 +2559,7 @@ const unb64u = t => { const bin = atob(t.replace(/-/g,"+").replace(/_/g,"/")); r
 /* el QR abre la verificación pública con el código y los datos del documento */
 const verifyText = d => HOST.verifyUrl(d.cod);
 function paperHead(){ const C = docCfg(), col = docColor(), band = C.estilo !== "blanco", im = (x, cls) => `<img class="plogo ${cls}" src="${esc(x.src)}" alt="">`;
-  return `<div class="ph ${band ? "band" : ""}" style="--doc:${col}">${C.logoIzq ? im(C.logoIzq,"l") : ""}<div class="pht"><b>${esc(DB.cfg.nombre)}</b><small>${esc(docSub())}</small></div>${C.logoDer ? im(C.logoDer,"r") : band ? "" : `<div class="seal" style="box-shadow:inset 0 0 0 2px ${col};color:${col};background:none">IESTP<br>CHINCHA</div>`}</div>${C.lema ? `<p class="lema">“${esc(C.lema)}”</p>` : ""}` }
+  return `<div class="ph ${band ? "band" : ""}" style="--doc:${col}">${C.logoIzq ? im(C.logoIzq,"l") : ""}<div class="pht"><b>${esc(DB.cfg.nombre)}</b><small>${esc(docSub())}</small></div>${C.logoDer ? im(C.logoDer,"r") : band ? "" : `<div class="seal" style="box-shadow:inset 0 0 0 2px ${col};color:${col};background:none">IESTP<br>NASCA</div>`}</div>${C.lema ? `<p class="lema">“${esc(C.lema)}”</p>` : ""}` }
 function paperSign(){ const C = docCfg(); return C.firma ? `<div class="pfirma">${C.firmaImg ? `<img src="${esc(C.firmaImg.src)}" alt="Firma">` : ""}<span></span><b>${esc(docFirmaNom())}</b><small>${esc(C.firmaCargo || "")}</small></div>` : "" }
 function paperFoot(d){ const pie = docCfg().pie; return paperSign() + `<div class="pf"><div><b style="color:var(--paper-ink)">Código de verificación: <span class="mono">${d.cod}</span></b><br>Emitido el ${fd(d.fecha)} · Verifique su autenticidad en el portal institucional, opción “Verificar documento”.</div><div class="qr" aria-label="Código QR de verificación">${qrSvg(verifyText(d))}</div></div>${pie ? `<p class="ppie">${esc(pie)}</p>` : ""}` }
 function pdfVerify(doc, d, y){
@@ -2812,7 +2812,7 @@ const plazoRec = r => { const due = addBiz(r.fecha, DB.cfg.plazoReclamo); return
 function renderLogin(){
   const demo = HOST.users().filter(u => u.estado === "Activo");
   return `<div class="login">
-  <section class="lb"><div class="brandbox" style="border:0;padding:0">${sealHtml()}<div><b>${esc(DB.cfg.siglas)}</b><small>Ministerio de Educación · DRE Ica · Chincha</small></div></div>
+  <section class="lb"><div class="brandbox" style="border:0;padding:0">${sealHtml()}<div><b>${esc(DB.cfg.siglas)}</b><small>Ministerio de Educación · DRE Ica · Nasca</small></div></div>
     <h1>Intranet Institucional</h1>
     <p>Plataforma de gestión académica y administrativa: horarios, certificaciones, títulos, trámite documentario, libro de reclamaciones, bolsa laboral y portafolio docente en un solo sistema.</p>
     <div class="mods">${MODS.filter(m => m[2]).map(m => `<div>${ICO[m[0]] || ""}<span>${m[2]}</span>${m[1]}</div>`).join("")}</div>
@@ -3757,7 +3757,7 @@ function docsConfig(){
     <div class="fld"><label for="dc_fc">Cargo</label><input id="dc_fc" name="firmaCargo" value="${esc(C.firmaCargo)}" maxlength="80" ${ro}></div></div>
     ${logo("firmaImg","Imagen de la firma (opcional)","Una firma escaneada sobre fondo blanco o transparente.")}</section>
   <section class="panel"><div><h2>Pie de página</h2></div>
-    <div class="fld"><label for="dc_pie">Texto del pie</label><input id="dc_pie" name="pie" value="${esc(C.pie)}" placeholder="Ej.: Av. Unión N.º 500, Pueblo Nuevo, Chincha · direcciongeneral@iestpchincha.edu.pe" maxlength="160" ${ro}></div></section>
+    <div class="fld"><label for="dc_pie">Texto del pie</label><input id="dc_pie" name="pie" value="${esc(C.pie)}" placeholder="Ej.: Av. Guardia Civil s/n, Panamericana Sur km 449, Nasca · mesapartes2020@istpnasca.edu.pe" maxlength="160" ${ro}></div></section>
   ${ed ? `<div class="btnrow"><button class="btn" type="submit">Guardar textos</button><button type="button" class="btn sec" data-act="docSample">Descargar PDF de ejemplo</button><button type="button" class="btn ghost" data-act="docReset">Restablecer</button></div>` : ""}
   </form></div>
   <aside class="ap-preview"><section class="panel"><h2>Vista previa</h2><div class="paper" style="padding:22px;--pp:22px;--pp2:22px;gap:10px;font-size:.86rem">${paperHead()}<h2 style="font-size:1rem">REPORTE DE VALIDACIÓN DE TÍTULO</h2><dl class="dl"><dt>Titulado(a)</dt><dd>Nombre de ejemplo</dd><dt>Programa</dt><dd>${esc((DB.programas[0]||{}).nombre || "Programa de estudios")}</dd></dl>${paperFoot(sample)}</div></section></aside></div>`;
@@ -4328,7 +4328,7 @@ const bic = n => `<svg viewBox="0 0 24 24" aria-hidden="true">${BRAND[n]}</svg>`
 const THEME_FONTS = { Montserrat: '"Montserrat","Inter",system-ui,Arial,sans-serif', Poppins: '"Poppins","Inter",system-ui,Arial,sans-serif', Merriweather: '"Merriweather",Georgia,"Times New Roman",serif', Inter: '"Inter",system-ui,Arial,sans-serif' };
 const BODY_FONTS = { Inter: '"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif', Poppins: '"Poppins","Inter",system-ui,Arial,sans-serif', Sistema: 'system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif' };
 const THEME_DEFAULTS = {
-  pisco: { label: 'Chincha institucional', desc: 'Azul marino, celeste y oro del escudo del IESTP CHINCHA', modo: 'claro', navy: '#0b1d3f', navy2: '#123a7a', blue: '#0a7fc2', gold: '#f5c400', fh: 'Montserrat', ff: 'Inter', r: 12, base: true },
+  pisco: { label: 'Nasca institucional', desc: 'Tema del portal institucional de Nasca', modo: 'claro', navy: '#0b1d3f', navy2: '#123a7a', blue: '#0a7fc2', gold: '#f5c400', fh: 'Montserrat', ff: 'Inter', r: 12, base: true },
   institucional: { label: 'Institucional', desc: 'Azul marino y dorado', modo: 'claro', navy: '#0a2a5e', navy2: '#0d3a80', blue: '#1556b8', gold: '#f2b705', fh: 'Montserrat', ff: 'Inter', r: 12, base: true },
   esmeralda: { label: 'Esmeralda', desc: 'Verde y ámbar', modo: 'claro', navy: '#0b3d2e', navy2: '#0f5a42', blue: '#12805a', gold: '#f4b400', fh: 'Poppins', ff: 'Inter', r: 16, base: true },
   vino: { label: 'Académico', desc: 'Vino y oro, títulos con serifa', modo: 'claro', navy: '#4a0f1f', navy2: '#6d1a2e', blue: '#9e2238', gold: '#d9a520', fh: 'Merriweather', ff: 'Inter', r: 6, base: true },
@@ -4372,7 +4372,7 @@ function logoSVG(sigla = 'CH') {
   for (let i = 0; i < 16; i++) { const a = i * 22.5; teeth += `<rect x="46" y="2" width="8" height="12" rx="1.5" fill="${TC.gold}" transform="rotate(${a} 50 50)"/>`; }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${teeth}<circle cx="50" cy="50" r="40" fill="${TC.gold}"/><circle cx="50" cy="50" r="34" fill="${TC.navy}"/><circle cx="50" cy="50" r="34" fill="none" stroke="#fff" stroke-width="1"/><path d="M30 56h40v4H30z" fill="${TC.gold}"/><path d="M33 56c0-9 7.5-16 17-16s17 7 17 16" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M50 26v14M44 32l6-6 6 6" stroke="${TC.gold}" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M36 48l14-5 14 5" stroke="#fff" stroke-width="2" fill="none"/><text x="50" y="72" text-anchor="middle" font-family="Arial,Helvetica" font-weight="900" font-size="8.5" fill="#fff" letter-spacing=".5">${esc(sigla)}</text><text x="50" y="80" text-anchor="middle" font-family="Arial" font-size="5" fill="${TC.gold}">I.E.S.P.</text></svg>`;
 }
-function campusSVG(seed = 1, w = 1600, h = 600, label = 'IESTP CHINCHA') {
+function campusSVG(seed = 1, w = 1600, h = 600, label = 'IESTP NASCA') {
   const r = hashStr('c' + seed); const sky = r % 2 ? ['#5aa4e8', '#cfe6fb'] : ['#3d8fdf', '#e3f1fd'];
   let palms = '';
   for (let i = 0; i < 4; i++) { const x = 120 + i * 430 + (r >> i) % 60; palms += `<g transform="translate(${x} ${h - 70})"><path d="M0 0 C 6 -90 0 -160 10 -230" stroke="#6b4f2a" stroke-width="12" fill="none"/>${[0, 1, 2, 3, 4, 5].map(k => `<path d="M10 -230 q ${-90 + k * 36} ${-30 + Math.abs(k - 2.5) * 22} ${-110 + k * 44} ${40 + Math.abs(k - 2.5) * 18}" stroke="#2f7d3a" stroke-width="14" fill="none" stroke-linecap="round"/>`).join('')}</g>`; }
@@ -4707,7 +4707,7 @@ function parseCSV(text) {
    Todo lo que aparece aquí es editable desde el panel.
    Nombres de docentes, estudiantes, montos y cifras son ficticios.
    ========================================================= */
-const SEED_VERSION = 13; // v13: Portal Web 2026 del IESTP CHINCHA (plana docente con CV, libro de reclamaciones, bolsa laboral y mesa de partes)
+const SEED_VERSION = 13; // v13: Portal Web 2026 del IESTP NASCA (plana docente con CV, libro de reclamaciones, bolsa laboral y mesa de partes)
 function seedDB() { throw new Error('Los datos se inicializan en PHP y MySQL.'); }
 const DEMO_USERS = [];
 
@@ -4728,7 +4728,7 @@ const sortO = a => a.slice().sort((x, y) => (x.orden || 0) - (y.orden || 0));
 const page = clave => P('paginas').find(p => p.clave === clave);
 const persona = id => P('personas').find(p => p.id === id);
 const fullName = p => p ? `${p.titulo ? p.titulo + ' ' : ''}${p.nombres} ${p.apellidos}` : '';
-const publicTeacherVisible = p => !p?.cv?.autoriza?.revocado && (p?.cv?.autoriza?.ok === true || /^https:\/\/(www\.)?iestpchincha\.edu\.pe\/nosotros\//.test(p?.fuente || ''));
+const publicTeacherVisible = p => !p?.cv?.autoriza?.revocado && (p?.cv?.autoriza?.ok === true || /^https:\/\/(www\.)?istpnasca\.edu\.pe\/(?:plana-docente|directorio-institucional|11298-2)\//.test(p?.fuente || ''));
 const progs = () => sortO(P('programas').filter(isPub));
 const progById = id => P('programas').find(p => p.id === id);
 const safePortalLink = (value, internal = true) => { if (typeof value !== 'string' || !value) return false; if (internal && value.startsWith('#/')) return true; try { const url = new URL(value); return ['http:', 'https:'].includes(url.protocol); } catch { return false; } };
@@ -4793,7 +4793,7 @@ function footerHTML() {
     <section class="f-col f-about"><a class="f-brand" href="#/"><img src="${logoSrc()}" alt=""><span><strong>${esc(i.nombreCorto)}</strong><small>${esc(i.nombre)}</small></span></a><p>${esc(i.descripcion)}</p>${soc ? `<div class="social f-social" aria-label="Redes sociales">${soc}</div>` : ''}</section>
     <nav class="f-col" aria-label="Enlaces del pie de página"><h2>Enlaces rápidos</h2><ul class="f-links">${links.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join('')}</ul></nav>
     <section class="f-col"><h2>Contacto</h2><ul class="f-contact">${ci('map', 'Dirección', `<span>${esc(i.direccion)}</span>`)}${ci('phone', 'Teléfono' + (i.telefonoNota ? ' · ' + esc(i.telefonoNota) : ''), `<a href="tel:${esc(i.telefono.replace(/\D/g, ''))}">${esc(i.telefono)}</a>`)}${ci('mail', 'Correo', `<a href="mailto:${esc(i.correo)}">${esc(i.correo)}</a>`)}${ci('clock', 'Horario de atención', `<span>${esc(i.horario)}</span>`)}</ul></section>
-    <section class="f-col"><h2>Boletín informativo</h2><p>Registra tu interés en recibir el boletín institucional. El envío por correo se habilitará posteriormente.</p><form class="newsletter" data-newsletter style="flex-wrap:wrap"><details style="flex-basis:100%;color:#102b50;background:#fff;padding:8px"><summary>Verificación y privacidad</summary>${captchaHTML('cap-nl')}<label><input type="checkbox" name="acepto" required> Acepto la política de privacidad.</label></details><label class="sr-only" for="nl">Correo electrónico</label><input id="nl" type="email" placeholder="direcciongeneral@iestpchincha.edu.pe" required><button>Suscribirme</button></form>
+    <section class="f-col"><h2>Boletín informativo</h2><p>Registra tu interés en recibir el boletín institucional. El envío por correo se habilitará posteriormente.</p><form class="newsletter" data-newsletter style="flex-wrap:wrap"><details style="flex-basis:100%;color:#102b50;background:#fff;padding:8px"><summary>Verificación y privacidad</summary>${captchaHTML('cap-nl')}<label><input type="checkbox" name="acepto" required> Acepto la política de privacidad.</label></details><label class="sr-only" for="nl">Correo electrónico</label><input id="nl" type="email" placeholder="mesapartes2020@istpnasca.edu.pe" required><button>Suscribirme</button></form>
       <h2 class="f-h2b">Enlaces institucionales</h2><div class="f-logos"><a ${linkAttrs(ext('minedu') || 'https://www.gob.pe/minedu')}>MINEDU</a><a ${linkAttrs(ext('dre') || 'https://www.dreica.gob.pe/')}>DRE Ica</a><a href="#/servicios/libro-de-reclamaciones" class="f-lr">${ic('book')} Libro de Reclamaciones</a></div></section>
   </div>
   <div class="f-bottom"><div class="wrap"><span>© ${yearNow()} ${esc(i.nombre)}. Todos los derechos reservados.</span><nav aria-label="Enlaces legales"><a href="#/terminos-de-uso">Términos de uso</a><a href="#/politica-de-privacidad">Política de privacidad</a><a href="#/mapa-del-sitio">Mapa del sitio</a><a href="#/admin">Intranet</a></nav></div></div></footer>
@@ -4827,7 +4827,7 @@ function setSEO({ title, desc, crumbs = [], jsonld = [] }) {
   setMeta('meta[name="description"]', 'content', desc || s.descripcion);
   setMeta('meta[property="og:title"]', 'content', document.title);
   setMeta('meta[property="og:description"]', 'content', desc || s.descripcion);
-  const org = { '@context': 'https://schema.org', '@type': 'EducationalOrganization', name: inst().nombre, alternateName: inst().nombreCorto, foundingDate: inst().fechaCreacion, email: inst().correo, telephone: inst().telefono, address: { '@type': 'PostalAddress', streetAddress: inst().direccion, addressLocality: 'Pueblo Nuevo, Chincha', addressRegion: 'Ica', addressCountry: 'PE' }, sameAs: Object.values(DB.config.redes).filter(Boolean) };
+  const org = { '@context': 'https://schema.org', '@type': 'EducationalOrganization', name: inst().nombre, alternateName: inst().nombreCorto, foundingDate: inst().fechaCreacion, email: inst().correo, telephone: inst().telefono, address: { '@type': 'PostalAddress', streetAddress: inst().direccion, addressLocality: 'Nasca', addressRegion: 'Ica', addressCountry: 'PE' }, sameAs: Object.values(DB.config.redes).filter(Boolean) };
   const bc = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Inicio', item: location.origin + location.pathname + '#/' }].concat(crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 2, name: c[0], item: c[1] ? location.origin + location.pathname + c[1] : undefined }))) };
   let el = document.getElementById('jsonld'); if (!el) { el = document.createElement('script'); el.type = 'application/ld+json'; el.id = 'jsonld'; document.head.appendChild(el); }
   el.textContent = JSON.stringify([org, bc].concat(jsonld));
@@ -4945,11 +4945,11 @@ function teacherModal(id, progId) {
 R('nosotros/campus-e-informes', (path, q) => {
   const pg0 = page('campus'); if (!pg0 || !isPub(pg0)) return notFound(path);
   const i = inst(); const locs = sortO(P('locales').filter(isPub)); const L = locs[0] || { lat: i.lat, lng: i.lng, nombre: 'Sede principal', direccion: i.direccion };
-  const d = 0.006, bbox = `${L.lng - d},${L.lat - d},${L.lng + d},${L.lat + d}`;
+  const locationQuery = encodeURIComponent(L.direccion + ', Perú');
   const body = `<h1>${esc(pg0.titulo)}</h1><p class="lead">${esc(stripTags(pg0.contenido))}</p>
    <div class="info-cards"><div>${ic('map')}<span><b>Dirección</b><address style="font-style:normal">${esc(i.direccion)}</address></span></div><div>${ic('phone')}<span><b>Teléfono</b><a href="tel:${esc(i.telefono.replace(/\D/g, ''))}">${esc(i.telefono)}</a> (${esc(i.telefonoNota)})</span></div><div>${ic('mail')}<span><b>Correo institucional</b><a href="mailto:${esc(i.correo)}">${esc(i.correo)}</a></span></div></div>
-   <section><h2 style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">Nuestra ubicación <span style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn sm sec" href="https://www.google.com/maps/search/?api=1&query=${L.lat},${L.lng}" target="_blank" rel="noopener noreferrer">Abrir en Google Maps ${ic('ext').replace('<svg', '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"')}</a><a class="btn sm" href="https://www.google.com/maps/dir/?api=1&destination=${L.lat},${L.lng}" target="_blank" rel="noopener noreferrer">Cómo llegar</a></span></h2>
-   <iframe class="map" title="Mapa de ubicación de ${esc(i.nombreCorto)}" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${L.lat},${L.lng}"></iframe></section>
+   <section><h2 style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">Nuestra ubicación <span style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn sm sec" href="https://www.google.com/maps/search/?api=1&query=${locationQuery}" target="_blank" rel="noopener noreferrer">Abrir en Google Maps ${ic('ext').replace('<svg', '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"')}</a><a class="btn sm" href="https://www.google.com/maps/dir/?api=1&destination=${locationQuery}" target="_blank" rel="noopener noreferrer">Cómo llegar</a></span></h2>
+   <iframe class="map" title="Mapa de ubicación de ${esc(i.nombreCorto)}" loading="lazy" src="https://maps.google.com/maps?q=${locationQuery}&output=embed"></iframe></section>
    ${locs.length > 1 ? `<h2>Locales</h2><div class="grid g2">${locs.map(l => `<article class="card"><img src="${img(l.foto)}" alt="" style="aspect-ratio:16/9;object-fit:cover;border-radius:10px 10px 0 0"><div class="cb"><h3>${esc(l.nombre)}</h3><p>${esc(l.direccion)}<br>${esc(l.telefono)} · ${esc(l.correo)}<br>${esc(l.horario)}</p></div></article>`).join('')}</div>` : ''}
    <section style="margin-top:22px"><h2>${ic('mail').replace('<svg', '<svg style="width:22px;height:22px;stroke:var(--link);fill:none;stroke-width:2;vertical-align:-4px"')} Contáctanos</h2><p>Completa el formulario y te responderemos a la brevedad.</p>${contactForm(q.get('programa'))}</section>`;
   const html = shell(path, { title: 'Campus e Informes', desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Campus e Informes']], banner: { title: 'Nosotros', text: 'Conoce nuestra identidad, historia y el compromiso con la formación técnica.' }, side: nosotrosSide('campus-e-informes') + `<figure class="side-box" style="margin:0 0 18px"><img src="${img(pg0.imagen || L.foto)}" alt="Campus institucional" style="aspect-ratio:4/3;object-fit:cover"><figcaption class="pad"><strong>Un campus para grandes oportunidades</strong></figcaption></figure><section class="side-box"><h2>Horarios de atención</h2><div class="pad"><p style="margin:0 0 6px"><b>${esc(i.horario)}</b></p><p style="margin:0">${esc(i.horarioSab || '')}</p></div></section>`, body });
@@ -5008,8 +5008,8 @@ R('programas/:slug', (path, q, prm) => {
   const body = `
    <section class="block">${hblock('target', 'Perfil de egreso')}<div class="prose">${sanitize(p.perfil)}</div></section>
    <section class="block">${hblock('briefcase', 'Campo laboral')}<ul class="fields-list">${(p.campoItems || []).filter(Boolean).map(c => `<li>${esc(c)}</li>`).join('')}</ul></section>
-   <section class="block">${hblock('layers', 'Malla curricular')}<p>Plan de estudios organizado en ${p.modulos.length} módulos profesionales · ${totalC} créditos.</p>${p.modulos.map((m, i) => `<details class="mod" ${i === 0 ? 'open' : ''}><summary>${esc(m.codigo)} · ${esc(m.nombre)}</summary><div class="tbl-wrap" style="border:0;border-radius:0"><table class="tbl light"><thead><tr><th>Semestre</th><th>Unidad didáctica</th><th class="num">Créditos</th><th class="num">Horas</th></tr></thead><tbody>${m.uds.map(u => `<tr><td>${esc(u.semestre)}</td><td>${esc(u.nombre)}</td><td class="num">${esc(u.creditos)}</td><td class="num">${esc(u.horas)}</td></tr>`).join('')}<tr><td colspan="4"><b>Experiencias formativas en situaciones reales de trabajo:</b> ${esc(m.efsrt || '—')}</td></tr></tbody></table></div></details>`).join('')}</section>
-   <section class="block grid g2">${dl(p.brochure, 'Brochure del programa', 'Conoce más sobre el programa, perfil, competencias y oportunidades.')}${dl(p.malla, 'Malla curricular vigente', 'Revisa la estructura curricular, semestres y unidades didácticas.', '#1e7e34', 'PDF')}</section>
+   <section class="block">${hblock('layers', 'Malla curricular')}<p>Certificación modular publicada: ${p.modulos.length} módulos profesionales.${totalC ? ` Total transcrito: ${totalC} créditos.` : ' Consulta las unidades didácticas, horas y créditos en el itinerario oficial descargable.'}</p>${p.modulos.map((m, i) => `<details class="mod" ${i === 0 ? 'open' : ''}><summary>${esc(m.codigo)} · ${esc(m.nombre)}</summary><div class="tbl-wrap" style="border:0;border-radius:0"><table class="tbl light"><thead><tr><th>Semestre</th><th>Unidad didáctica</th><th class="num">Créditos</th><th class="num">Horas</th></tr></thead><tbody>${m.uds.length ? '' : '<tr><td colspan="4">Unidades didácticas, créditos y horas en el PDF oficial del itinerario formativo.</td></tr>'}${m.uds.map(u => `<tr><td>${esc(u.semestre)}</td><td>${esc(u.nombre)}</td><td class="num">${esc(u.creditos)}</td><td class="num">${esc(u.horas)}</td></tr>`).join('')}<tr><td colspan="4"><b>Experiencias formativas en situaciones reales de trabajo:</b> ${esc(m.efsrt || '—')}</td></tr></tbody></table></div></details>`).join('')}</section>
+   <section class="block grid g2">${dl(p.brochure, 'Brochure del programa', 'Conoce más sobre el programa, perfil, competencias y oportunidades.')}${dl(p.malla, 'Itinerario formativo publicado (2024)', 'PDF oficial de 2024; consultar actualizaciones con el programa.', '#1e7e34', 'PDF')}</section>
    ${coord ? `<section class="block">${hblock('user', 'Coordinación del programa')}<div class="card" style="display:flex;gap:16px;padding:16px;align-items:center;flex-wrap:wrap"><img src="${img(coord.foto)}" alt="Fotografía de ${esc(fullName(coord))}" style="width:96px;height:96px;border-radius:50%;object-fit:cover"><div style="flex:1;min-width:220px"><strong style="color:var(--hc)">${esc(fullName(coord))}</strong><br><small style="color:var(--muted)">Coordinador(a) del programa · <a href="mailto:${esc(coord.correo)}">${esc(coord.correo)}</a></small>${p.coordinadorMsg ? `<p style="margin:6px 0 0;font-style:italic">“${esc(p.coordinadorMsg)}”</p>` : ''}</div></div></section>` : ''}
    <section class="block">${hblock('users', 'Plana docente del programa')}${ds.length ? `<div class="grid g4">${ds.map(d => `<article class="card tcard"><img src="${img(d.foto)}" alt="Fotografía de ${esc(fullName(d))}" loading="lazy"><div class="cb"><strong>${esc(fullName(d))}</strong><small>${esc(d.especialidad)}</small><button class="btn xs sec" data-prof="${d.id}">Ver perfil</button></div></article>`).join('')}</div>` : emptyMsg('docentes')}</section>
    ${(p.convenios || []).length ? `<section class="block">${hblock('building', 'Convenios para EFSRT')}<ul>${p.convenios.map(c => `<li>${esc(c)}</li>`).join('')}</ul></section>` : ''}
@@ -5027,18 +5027,18 @@ R('programas/:slug', (path, q, prm) => {
 /* ---------- ADMISIÓN ---------- */
 R('admision', (path, q) => {
   const all = P('admisiones').filter(a => a.estado !== 'Borrador' || a._preview).sort((a, b) => b.anio - a.anio);
-  const a = all.find(x => String(x.anio) === q.get('anio')) || admVigente();
+  const a = all.find(x => String(x.anio) === q.get('anio')) || admVigente() || all.filter(x => x.estado === 'Publicado').sort((x,y) => y.anio-x.anio)[0];
   if (!a) return shell(path, { title: 'Admisión', crumbs: [['Admisión y Matrículas', '#/admision'], ['Admisión']], banner: { title: 'Admisión' }, side: null, body: `<h1>Admisión</h1>${emptyMsg('procesos de admisión')}` });
   const tupaAdm = P('tupa').filter(t => isPub(t) && (t.categoria === 'Admisión' || /EXAMEN DE ADMISI/i.test(t.categoria)) && t.anio == (DB.tupaDocs.anio || 2026));
   const uit = DB.config.uit[DB.tupaDocs.anio] || 0;
   const tbtn = (pid, t) => { const r = (a.resultados[pid] || {})[t]; return r ? `<button class="btn xs violet" data-res="${pid}|${t}">Ver Resultados</button>` : '<span aria-label="Sin resultados publicados" style="color:var(--muted)">—</span>'; };
-  const body = `<p style="text-align:center;margin:0;color:var(--link);font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:13px">${a.vigente ? 'Bienvenido al proceso de' : 'Proceso histórico (cerrado)'}</p><h1 style="text-align:center;padding-bottom:0" class="noline">${esc(a.titulo)}</h1>${a.descripcion ? `<p class="lead" style="text-align:center;max-width:760px;margin:0 auto 16px">${esc(a.descripcion)}</p>` : ''}
+  const body = `<p style="text-align:center;margin:0;color:var(--link);font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:13px">${a.inscripcionesAbiertas === true ? 'Inscripciones abiertas' : 'Información del proceso publicado'}</p><h1 style="text-align:center;padding-bottom:0" class="noline">${esc(a.titulo)}</h1>${a.descripcion ? `<p class="lead" style="text-align:center;max-width:760px;margin:0 auto 16px">${esc(a.descripcion)}</p>` : ''}
    ${!a.vigente ? `<div class="notice warn">Estás consultando el proceso ${esc(a.anio)}, que ya concluyó. <a href="#/admision">Ver el proceso vigente</a>.</div>` : ''}
    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:14px 0 22px">${a.prospecto ? `<button class="btn" data-docx="prospecto">${ic('file').replace('<svg', '<svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"')} ${esc(prospectusLabel(a.prospecto))}</button><button class="btn ghost sm" data-dlx="prospecto" aria-label="Descargar ${esc(prospectusLabel(a.prospecto))}">${ic('download').replace('<svg', '<svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2"')}</button>` : ''}${a.reglamento ? `<button class="btn" data-docx="reglamento">${ic('file').replace('<svg', '<svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"')} REGLAMENTO DE ADMISIÓN</button><button class="btn ghost sm" data-dlx="reglamento" aria-label="Descargar reglamento">${ic('download').replace('<svg', '<svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2"')}</button>` : ''}</div>
-   <section><h2>Resultados por programa de estudio</h2><div class="tbl-wrap"><table class="tbl"><caption class="sr-only">Resultados del proceso de admisión ${esc(a.anio)} por programa y turno</caption><thead><tr><th class="c">N.º</th><th>Programa de estudio</th><th class="c">Resultado turno mañana</th><th class="c">Resultado turno tarde</th></tr></thead><tbody>${progs().map((p, i) => `<tr><td class="c">${i + 1}</td><td>${esc(p.nombre)}</td><td class="c">${tbtn(p.id, 'M')}</td><td class="c">${tbtn(p.id, 'T')}</td></tr>`).join('')}</tbody></table></div></section>
+   <section><h2>Resultados por programa de estudio</h2><div class="tbl-wrap"><table class="tbl"><caption class="sr-only">Resultados del proceso de admisión ${esc(a.anio)} por programa y turno</caption><thead><tr><th class="c">N.º</th><th>Programa de estudio</th><th class="c">Resultados oficiales</th></tr></thead><tbody>${progs().map((p, i) => `<tr><td class="c">${i + 1}</td><td>${esc(p.nombre)}</td><td class="c">${tbtn(p.id, Object.keys(a.resultados[p.id] || {})[0])}</td></tr>`).join('')}</tbody></table></div></section>
    <div class="grid g2" style="margin-top:22px">
      <section><h2>Cronograma</h2>${(a.cronograma || []).length ? `<div class="tbl-wrap"><table class="tbl light"><thead><tr><th>Actividad</th><th>Fecha</th></tr></thead><tbody>${a.cronograma.map(c => `<tr><td>${esc(c.actividad)}</td><td>${esc(c.fecha)}</td></tr>`).join('')}</tbody></table></div>` : emptyMsg('actividades')}</section>
-     <section><h2>Vacantes por programa y turno</h2><div class="tbl-wrap"><table class="tbl light"><thead><tr><th>Programa</th><th class="num">Mañana</th><th class="num">Tarde</th></tr></thead><tbody>${progs().map(p => { const v = (a.vacantes || {})[p.id] || {}; return `<tr><td>${esc(clamp(p.nombre, 46))}</td><td class="num">${v.M || '—'}</td><td class="num">${v.T || '—'}</td></tr>`; }).join('')}</tbody></table></div></section>
+     <section><h2>Vacantes publicadas por programa</h2><p>La fuente informa 30 vacantes por programa: 12 ordinarias, 10 CEPRE y ocho modalidades con una vacante cada una. No las desglosa por turno.</p><div class="tbl-wrap"><table class="tbl light"><thead><tr><th>Programa</th><th class="num">Total publicado</th></tr></thead><tbody>${progs().map(p => { const v = (a.vacantes || {})[p.id] || {}; return `<tr><td>${esc(p.nombre)}</td><td class="num">${v.total ?? ((+v.M || 0) + (+v.T || 0) + (+v.N || 0))}</td></tr>`; }).join('')}</tbody></table></div></section>
      <section><h2>Requisitos</h2>${(a.requisitos || []).length ? `<ul>${a.requisitos.map(r => `<li>${esc(r)}</li>`).join('')}</ul>` : emptyMsg('requisitos')}</section>
      <section><h2>Modalidades</h2>${(a.modalidades || []).map(m => `<p><b>${esc(m.nombre)}:</b> ${esc(m.detalle)}</p>`).join('') || emptyMsg('modalidades')}</section>
    </div>
@@ -5058,7 +5058,7 @@ R('matricula', path => {
    <div class="prose">${sanitize(m.descripcion)}</div>
    <div class="grid g3">${col('money', 'Costos de matrícula', 'costos', `${tupaM.length ? `<table class="tbl light subtbl" style="margin-top:10px"><tbody>${tupaM.map(t => `<tr><td>${esc(t.denominacion)}</td><td class="num">${money(t.monto)}</td></tr>`).join('')}</tbody></table>` : ''}${m.docTasas ? `<button class="btn sm sec" style="margin-top:10px;width:100%" data-tasas>Ver tasas y costos vigentes →</button>` : ''}`)}${col('user', 'Matrícula de ingresantes', 'ingresantes')}${col('restore', 'Ratificación de matrícula', 'ratificacion')}</div>
    ${(m.cronograma || []).length ? `<h2>Cronograma del periodo ${esc(m.periodo)}</h2><div class="tbl-wrap"><table class="tbl light"><thead><tr><th>Actividad</th><th>Fecha</th></tr></thead><tbody>${m.cronograma.map(c => `<tr><td>${esc(c.actividad)}</td><td>${esc(c.fecha)}</td></tr>`).join('')}</tbody></table></div>` : ''}
-   <div class="grid g4" style="margin-top:20px"><a class="card cb" href="#/transparencia/tupa" style="text-decoration:none"><b>TUPA</b><br><small>Tasas educativas vigentes</small></a><a class="card cb" href="#/transparencia/documentos-gestion" style="text-decoration:none"><b>Reglamento Institucional</b><br><small>Normas académicas</small></a><a class="card cb" href="#/preguntas-frecuentes" style="text-decoration:none"><b>Preguntas frecuentes</b><br><small>Resuelve tus dudas</small></a><a class="card cb" href="#/contacto" style="text-decoration:none"><b>Mesa de ayuda</b><br><small>Escríbenos</small></a></div>`;
+   <div class="grid g4" style="margin-top:20px"><a class="card cb" href="#/transparencia/tupa" style="text-decoration:none"><b>TUPA</b><br><small>Tasas educativas publicadas</small></a><a class="card cb" href="#/transparencia/documentos-gestion" style="text-decoration:none"><b>Reglamento Institucional</b><br><small>Normas académicas</small></a><a class="card cb" href="#/preguntas-frecuentes" style="text-decoration:none"><b>Preguntas frecuentes</b><br><small>Resuelve tus dudas</small></a><a class="card cb" href="#/contacto" style="text-decoration:none"><b>Mesa de ayuda</b><br><small>Escríbenos</small></a></div>`;
   const html = shell(path, { title: m.titulo, desc: `Matrícula ${m.periodo}: requisitos, costos y fecha de inicio de clases.`, crumbs: [['Admisión y Matrículas', '#/admision'], ['Matrícula']], banner: { kicker: 'Proceso académico', title: m.titulo, text: 'Organiza tu futuro, continúa tu formación' }, side: null, body });
   return { html, after: () => { const b = $('[data-tasas]'); if (b) b.onclick = () => openDoc(m.docTasas); } };
 });
@@ -5142,7 +5142,7 @@ R('transparencia/inversiones', (path, q) => {
   const total = rows.reduce((a, i) => a + (+i.monto || 0), 0);
   const body = `<h1>Inversiones y Recursos Económicos</h1><p class="lead">Información sobre inversiones, reinversiones, obras de infraestructura (incluidas obras por impuestos), donaciones y recursos de diversa fuente, incluida la contabilidad de Recursos Directamente Recaudados (RDR).</p>
    <div class="chips" role="group" aria-label="Filtrar por tipo"><button class="chip" aria-pressed="${!t}" data-t="">Todos</button>${tipos.map(x => `<button class="chip" aria-pressed="${t === x}" data-t="${esc(x)}">${esc(x)}</button>`).join('')}</div>
-   ${rows.length ? `<p role="status">${rows.length} registro(s) · Monto total: <b>${money(total)}</b></p><div class="grid g2">${rows.map(i => `<article class="card ncard"><div class="img"><img src="${img(i.imagen)}" alt="" loading="lazy"><span class="badge">${esc(i.tipo)}</span></div><div class="cb"><div class="meta"><time datetime="${esc(i.fecha)}">${fdate(i.fecha + 'T12:00:00')}</time><span>${esc(i.fuente)}</span></div><h3>${esc(i.titulo)}</h3><p>${esc(i.descripcion)}</p><dl class="kv" style="grid-template-columns:110px 1fr;margin-bottom:10px"><dt>Monto</dt><dd><b>${money(i.monto)}</b></dd><dt>Estado</dt><dd>${esc(i.estadoAvance)}</dd></dl>${i.documento ? `<button class="btn xs sec" data-doc="${i.id}">Ver documento sustentatorio</button>` : '<small style="color:var(--muted)">Sin documento adjunto</small>'}</div></article>`).join('')}</div>` : emptyMsg('inversiones o recursos')}`;
+   ${rows.length ? `<p role="status">${rows.length} registro(s) · Monto total: <b>${money(total)}</b></p><div class="grid g2">${rows.map(i => `<article class="card ncard"><div class="img"><img src="${img(i.imagen)}" alt="" loading="lazy"><span class="badge">${esc(i.tipo)}</span></div><div class="cb"><div class="meta"><time datetime="${esc(i.fecha)}">${fdate(i.fecha + 'T12:00:00')}</time><span>${esc(i.fuente)}</span></div><h3>${esc(i.titulo)}</h3><p>${esc(i.descripcion)}</p><dl class="kv" style="grid-template-columns:110px 1fr;margin-bottom:10px"><dt>Monto</dt><dd><b>${money(i.monto)}</b></dd><dt>Estado</dt><dd>${esc(i.estadoAvance)}</dd></dl>${i.documento ? `<button class="btn xs sec" data-doc="${i.id}">Ver documento sustentatorio</button>` : '<small style="color:var(--muted)">Sin documento adjunto</small>'}</div></article>`).join('')}</div>` : (page('inversiones') ? sanitize(page('inversiones').contenido) : emptyMsg('inversiones o recursos'))}`;
   const html = shell(path, { title: 'Inversiones y Recursos Económicos', crumbs: [['Transparencia', '#/transparencia/documentos-gestion'], ['Inversiones y Recursos Económicos']], banner: { kicker: 'Transparencia institucional', title: 'Inversiones y Recursos', text: 'Rendición de cuentas a la comunidad' }, side: transpSide('inversiones'), body });
   return { html, after: () => { $$('[data-t]').forEach(b => b.onclick = () => go('#/transparencia/inversiones' + (b.dataset.t ? '?tipo=' + encodeURIComponent(b.dataset.t) : ''))); $$('[data-doc]').forEach(b => b.onclick = () => openDoc(items.find(i => i.id === b.dataset.doc).documento)); } };
 });
@@ -5224,10 +5224,10 @@ R('transparencia/licenciamiento', path => {
 R('transparencia/tupa', (path, q) => {
   const y = DB.tupaDocs.anio; const uit = DB.config.uit[y] || 0; const rows = P('tupa').filter(t => isPub(t) && t.anio == y).sort(tupaOrder);
   const cats = [...new Set(rows.map(r => r.categoria))];
-  const body = `<h1>Texto Único de Procedimientos Administrativos (TUPA) ${esc(y)}</h1><p class="lead">Relación de derechos, tasas y montos vigentes. Base de cálculo: UIT ${esc(y)} = <b>${money(uit)}</b>.</p>
+  const body = `<h1>Texto Único de Procedimientos Administrativos (TUPA) ${esc(y)}</h1><p class="lead">Tasas publicadas para ${esc(y)}. Confirma su aplicación actual antes de pagar. ${esc(DB.tupaDocs.referencia || '')} Base de cálculo: UIT ${esc(y)} = <b>${money(uit)}</b>.</p>
    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">${DB.tupaDocs.resolucion ? '<button class="btn sec" data-td="resolucion">Resolución de aprobación (PDF)</button>' : ''}${DB.tupaDocs.tupa ? '<button class="btn" data-td="tupa">TUPA vigente (PDF)</button>' : ''}</div>
    <form class="filters" data-tf role="search"><div class="field"><label for="tf-s">Buscar concepto</label><input id="tf-s" name="s" placeholder="Ej.: certificado, matrícula, titulación"></div><div class="field"><label for="tf-c">Categoría</label><select id="tf-c" name="c"><option value="">Todas</option>${cats.map(c => `<option>${esc(c)}</option>`).join('')}</select></div><div class="actions"><button type="button" class="btn ghost" data-clear>Limpiar filtros</button></div></form><div id="tres"></div>`;
-  const html = shell(path, { title: 'TUPA ' + y, desc: 'Texto Único de Procedimientos Administrativos vigente.', crumbs: [['Transparencia', '#/transparencia/documentos-gestion'], ['TUPA']], banner: { kicker: 'Transparencia institucional', title: 'TUPA', text: 'Derechos, tasas y procedimientos' }, side: transpSide('tupa'), body });
+  const html = shell(path, { title: 'TUPA ' + y, desc: 'Tasas y procedimientos publicados por la institución.', crumbs: [['Transparencia', '#/transparencia/documentos-gestion'], ['TUPA']], banner: { kicker: 'Transparencia institucional', title: 'TUPA', text: 'Derechos, tasas y procedimientos' }, side: transpSide('tupa'), body });
   return {
     html, after: () => {
       const f = $('[data-tf]');
@@ -5241,13 +5241,13 @@ R('transparencia/tupa', (path, q) => {
 R('transparencia/estadisticas', (path, q) => {
   const st = P('estadisticas'); const years = [...new Set(st.map(s => s.anio))].sort(); const last5 = years.slice(-5);
   const sel = +(q.get('anio') || last5[last5.length - 1]);
-  const tot = (y, k) => st.filter(s => s.anio === y).reduce((a, s) => a + (+s[k] || 0), 0);
-  const chart = (k, t) => `<figure class="card cb chart-card" style="margin:0"><h3>${t}</h3><figcaption style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Total institucional por año (${last5[0]}–${last5[last5.length - 1]})</figcaption>${barChart(last5.map(y => ({ k: String(y), v: tot(y, k) })), { label: t + ' por año' })}</figure>`;
+  const tot = (y, k) => { const rows = st.filter(s => s.anio === y && s[k] != null); return rows.length ? rows.reduce((a,s) => a + (+s[k] || 0), 0) : null; };
+  const chart = (k, t) => `<figure class="card cb chart-card" style="margin:0"><h3>${t}</h3><figcaption style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Total institucional por año (${last5[0]}–${last5[last5.length - 1]})</figcaption>${barChart(last5.filter(y => tot(y,k) != null).map(y => ({ k: String(y), v: tot(y, k) })), { label: t + ' por año' })}</figure>`;
   const rows = progs().map(p => ({ p, s: st.find(x => x.anio === sel && x.programaId === p.id) || {} }));
-  const body = `<h1>Estadísticas institucionales</h1><p class="lead">Número de postulantes, ingresantes, matriculados, egresados y titulados por año y programa de estudio, además de becas y créditos educativos otorgados.</p>
+  const body = `<h1>Estadísticas institucionales</h1><p class="lead">Estadísticas por programa publicadas en el portal oficial. Los totales se calculan sumando las filas; pueden diferir del total escrito en la fuente. Una raya indica que el dato no está publicado, no que sea cero.</p>
    ${st.length ? `<div class="grid g3">${chart('ingresantes', 'Ingresantes')}${chart('matriculados', 'Matriculados')}${chart('egresados', 'Egresados')}</div>
    <h2>Detalle por programa de estudio</h2><div class="chips" role="group" aria-label="Año">${years.map(y => `<button class="chip" data-y="${y}" aria-pressed="${y === sel}">${y}</button>`).join('')}</div>
-   <div class="tbl-wrap"><table class="tbl"><caption class="sr-only">Estadísticas ${sel} por programa</caption><thead><tr><th>Programa de estudio</th><th class="num">Postulantes</th><th class="num">Ingresantes</th><th class="num">Matriculados</th><th class="num">Egresados</th><th class="num">Titulados</th><th class="num">Becas</th><th class="num">Créditos educ.</th></tr></thead><tbody>${rows.map(({ p, s }) => `<tr><td>${esc(p.nombre)}</td>${['postulantes', 'ingresantes', 'matriculados', 'egresados', 'titulados', 'becas', 'creditos'].map(k => `<td class="num">${s[k] != null ? num(s[k]) : '—'}</td>`).join('')}</tr>`).join('')}<tr style="font-weight:700;background:var(--sky)"><td>Total ${sel}</td>${['postulantes', 'ingresantes', 'matriculados', 'egresados', 'titulados', 'becas', 'creditos'].map(k => `<td class="num">${num(tot(sel, k))}</td>`).join('')}</tr></tbody></table></div>
+   <div class="tbl-wrap"><table class="tbl"><caption class="sr-only">Estadísticas ${sel} por programa</caption><thead><tr><th>Programa de estudio</th><th class="num">Postulantes</th><th class="num">Ingresantes</th><th class="num">Matriculados</th><th class="num">Egresados</th><th class="num">Titulados</th><th class="num">Becas</th><th class="num">Créditos educ.</th></tr></thead><tbody>${rows.map(({ p, s }) => `<tr><td>${esc(p.nombre)}</td>${['postulantes', 'ingresantes', 'matriculados', 'egresados', 'titulados', 'becas', 'creditos'].map(k => `<td class="num">${s[k] != null ? num(s[k]) : '—'}</td>`).join('')}</tr>`).join('')}<tr style="font-weight:700;background:var(--sky)"><td>Total ${sel}</td>${['postulantes', 'ingresantes', 'matriculados', 'egresados', 'titulados', 'becas', 'creditos'].map(k => `<td class="num">${tot(sel,k) == null ? '—' : num(tot(sel, k))}</td>`).join('')}</tr></tbody></table></div>
    <p style="margin-top:10px"><button class="btn sm sec" data-csv>${ic('download').replace('<svg', '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"')} Descargar datos (CSV)</button></p>` : emptyMsg('estadísticas')}`;
   const html = shell(path, { title: 'Estadísticas', crumbs: [['Transparencia', '#/transparencia/documentos-gestion'], ['Estadísticas']], banner: { kicker: 'Transparencia institucional', title: 'Estadísticas', text: 'Indicadores de los últimos 5 años' }, side: transpSide('estadisticas'), body });
   return { html, after: () => { bindChartTips(document); $$('[data-y]').forEach(b => b.onclick = () => go('#/transparencia/estadisticas?anio=' + b.dataset.y)); const c = $('[data-csv]'); if (c) c.onclick = () => downloadText(toCSV([['Año', 'Programa', 'Postulantes', 'Ingresantes', 'Matriculados', 'Egresados', 'Titulados', 'Becas', 'Créditos']].concat(st.map(s => [s.anio, (progById(s.programaId) || {}).nombre, s.postulantes, s.ingresantes, s.matriculados, s.egresados, s.titulados, s.becas, s.creditos]))), 'estadisticas.csv', 'text/csv'); } };
@@ -5354,7 +5354,7 @@ R('noticias/:slug', (path, q, prm) => {
   const n = P('noticias').find(x => x.slug === prm.slug && newsVisible(x));
   if (!n) return notFound(path);
   const rel = pubNews().filter(x => x.id !== n.id && x.categoriaId === n.categoriaId).slice(0, 3);
-  const url = location.protocol === 'file:' ? 'https://www.iestpchincha.edu.pe/' + location.hash : location.href;
+  const url = location.protocol === 'file:' ? 'https://istpnasca.edu.pe/' + location.hash : location.href;
   const body = `<article><header><div class="meta" style="display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13.5px"><time datetime="${esc(n.fecha)}">${fdate(n.fecha, true)}</time><span class="badge">${esc(catName(n.categoriaId))}</span></div><h1>${esc(n.titulo)}</h1><p class="lead">${esc(n.resumen)}</p></header>
    ${n.video ? `<div style="aspect-ratio:16/9;margin-bottom:16px"><iframe src="${esc(n.video)}" title="Video: ${esc(n.titulo)}" style="width:100%;height:100%;border:0;border-radius:10px" allowfullscreen loading="lazy"></iframe></div>` : `<figure class="figure"><img src="${img(n.imagen, 'ph:campus:4')}" alt="Imagen de la noticia: ${esc(n.titulo)}"><figcaption>${esc(n.titulo)}</figcaption></figure>`}
    <div class="prose">${sanitize(n.contenido)}</div>
@@ -5384,7 +5384,7 @@ R('mapa-del-sitio', path => {
   return { html: shell(path, { title: 'Mapa del sitio', crumbs: [['Mapa del sitio']], banner: { title: 'Mapa del sitio' }, side: null, body }), after: () => $('[data-sm]').onclick = downloadSitemap };
 });
 function downloadSitemap() {
-  const base = 'https://www.iestpchincha.edu.pe';
+  const base = 'https://istpnasca.edu.pe';
   const urls = ['/', '/programas', '/admision', '/matricula', '/becas', '/noticias', '/eventos', '/contacto', '/preguntas-frecuentes', '/mapa-del-sitio', '/servicios/mesa-de-partes', '/servicios/bolsa-laboral', '/servicios/consulta-certificados', '/servicios/complementarios'].concat(['presentacion', 'resena-historica', 'mision-vision', 'organizacion', 'reconocimientos', 'plana-jerarquica', 'plana-docente', 'campus-e-informes'].map(s => '/nosotros/' + s)).concat(['documentos-gestion', 'inversiones', 'libro-de-reclamaciones', 'licenciamiento', 'tupa', 'estadisticas', 'convocatorias'].map(s => '/transparencia/' + s)).concat(progs().map(p => '/programas/' + p.slug)).concat(pubNews().map(n => '/noticias/' + n.slug));
   downloadText(`\x3c?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `  <url><loc>${base}${u}</loc></url>`).join('\n')}\n</urlset>`, 'sitemap.xml', 'application/xml');
 }
@@ -5875,9 +5875,9 @@ SPECS.inversiones = {
 };
 SPECS.convocatorias = {
   key: 'convocatorias', mod: 'convocatorias', coll: 'convocatorias', title: 'Convocatorias', singular: 'convocatoria', icon: 'briefcase', states: ['Borrador', 'Publicado'], label: r => r.titulo,
-  sort: (a, b) => String(b.fecha).localeCompare(a.fecha), preview: () => '#/transparencia/convocatorias', filters: [{ n: 'situacion', l: 'Situación', opts: ['En curso', 'Concluida', 'Desierta', 'Cancelada'] }],
+  sort: (a, b) => String(b.fecha).localeCompare(a.fecha), preview: () => '#/transparencia/convocatorias', filters: [{ n: 'situacion', l: 'Situación', opts: ['Estado no confirmado', 'En curso', 'Concluida', 'Desierta', 'Cancelada'] }],
   cols: [{ l: 'Convocatoria', f: r => `<b>${esc(r.titulo)}</b><br><small>${esc(r.tipo)}</small>` }, { l: 'Fecha', f: r => fshort(r.fecha + 'T12:00') }, { l: 'Situación', f: r => esc(r.situacion) }, { l: 'Etapas', cls: 'num', f: r => (r.etapas || []).length }, { l: 'Estado', f: r => stBadge(r.estado) }],
-  fields: [{ n: 'titulo', l: 'Título', req: true, full: true }, { n: 'tipo', l: 'Tipo', t: 'select', req: true, opts: ['Contratación docente', 'Contratación administrativa (CAS)', 'Encargatura', 'Otros'] }, { n: 'fecha', l: 'Fecha de publicación', t: 'date', req: true }, { n: 'situacion', l: 'Situación', t: 'select', req: true, opts: ['En curso', 'Concluida', 'Desierta', 'Cancelada'] }, { n: 'descripcion', l: 'Descripción', t: 'textarea', full: true }, { n: 'bases', l: 'Bases', t: 'file', full: true, pubReq: true }, { n: 'etapas', l: 'Cronograma y resultados por etapa', t: 'rows', cols: [{ n: 'nombre', l: 'Etapa' }, { n: 'fecha', l: 'Fecha', t: 'date' }, { n: 'doc', l: 'Documento / resultado', t: 'file' }] }],
+  fields: [{ n: 'titulo', l: 'Título', req: true, full: true }, { n: 'tipo', l: 'Tipo', t: 'select', req: true, opts: ['Contratación docente', 'Contratación administrativa (CAS)', 'Encargatura', 'Otros'] }, { n: 'fecha', l: 'Fecha de publicación', t: 'date', req: true }, { n: 'situacion', l: 'Situación', t: 'select', req: true, opts: ['Estado no confirmado', 'En curso', 'Concluida', 'Desierta', 'Cancelada'] }, { n: 'descripcion', l: 'Descripción', t: 'textarea', full: true }, { n: 'bases', l: 'Bases', t: 'file', full: true, pubReq: true }, { n: 'etapas', l: 'Cronograma y resultados por etapa', t: 'rows', cols: [{ n: 'nombre', l: 'Etapa' }, { n: 'fecha', l: 'Fecha', t: 'date' }, { n: 'doc', l: 'Documento / resultado', t: 'file' }] }],
 };
 SPECS.documentos = {
   key: 'documentos', mod: 'documentos', coll: 'documentos', title: 'Documentos de gestión', singular: 'documento', icon: 'file', states: ['Borrador', 'Publicado', 'Histórico'], label: r => `${r.nombre} v${r.version}`,
@@ -5950,7 +5950,7 @@ SPECS.docentes = {
   fields: [
     { n: 'foto', l: 'Fotografía', t: 'image', full: true, hint: 'Formato vertical u horizontal; se recorta de forma uniforme en el portal.' },
     { n: 'titulo', l: 'Abreviatura (Ing., Lic., Mg., Dr.)', max: 8 }, { n: 'tipo', l: 'Tipo de personal', t: 'select', req: true, empty: false, opts: ['Docente', 'Administrativo'] },
-    { n: 'nombres', l: 'Nombres', req: true }, { n: 'apellidos', l: 'Apellidos', req: true },
+    { n: 'nombres', l: 'Nombres', req: true }, { n: 'apellidos', l: 'Apellidos', hint: 'Si la fuente no los desglosa, conserva el nombre completo en Nombres.' },
     { n: 'dni', l: 'Documento de identidad (DNI)', unique: true, max: 8, hint: 'Opcional y privado. Completar solo con un dato verificado.' }, { n: 'correo', l: 'Correo institucional', t: 'email' },
     { n: 'telefono', l: 'Teléfono (opcional, no se publica)' }, { n: 'web', l: 'Página web / ORCID (opcional)', t: 'url' },
     { n: 'especialidad', l: 'Especialidad o profesión', req: true }, { n: 'condicion', l: 'Condición', t: 'select', opts: ['Nombrado', 'Contratado'] },
@@ -5979,7 +5979,7 @@ SPECS.locales = {
   key: 'locales', mod: 'locales', coll: 'locales', title: 'Campus y locales', singular: 'local', icon: 'map', states: ESTADOS, label: r => r.nombre, order: true, preview: () => '#/nosotros/campus-e-informes',
   extraActs: () => `${can('paginas') ? '<a class="btn sec" href="#/admin/paginas/pg-campus">Editar página Campus e Informes</a>' : ''}${can('mensajes') ? '<a class="btn sec" href="#/admin/mensajes">Mensajes de contacto</a>' : ''}`,
   cols: [{ l: 'Foto', f: r => thumb(r.foto) }, { l: 'Local', f: r => `<b>${esc(r.nombre)}</b><br><small>${esc(r.direccion)}</small>` }, { l: 'Coordenadas', f: r => `${r.lat}, ${r.lng}` }, { l: 'Estado', f: r => stBadge(r.estado) }],
-  fields: [{ n: 'nombre', l: 'Nombre del local', req: true }, { n: 'telefono', l: 'Teléfono', req: true }, { n: 'direccion', l: 'Dirección (según partida registral)', req: true, full: true }, { n: 'correo', l: 'Correo', t: 'email' }, { n: 'horario', l: 'Horario de atención' }, { n: 'lat', l: 'Latitud', t: 'number', step: 'any', req: true }, { n: 'lng', l: 'Longitud', t: 'number', step: 'any', req: true }, { n: 'mapa', l: 'Vista previa de la ubicación', t: 'custom', render: w => `<iframe class="map" style="height:220px" title="Vista previa del mapa" src="https://www.openstreetmap.org/export/embed.html?bbox=${w.lng - .005},${w.lat - .005},${+w.lng + .005},${+w.lat + .005}&layer=mapnik&marker=${w.lat},${w.lng}"></iframe><button type="button" class="btn xs sec" data-mapr style="margin-top:6px">Actualizar vista previa con las coordenadas ingresadas</button>`, bind: (w, box, rer) => { $('[data-mapr]', box).onclick = () => rer(); } }, { n: 'foto', l: 'Foto del acceso principal', t: 'image', full: true }, { n: 'orden', l: 'Orden', t: 'number', side: true, min: 1 }],
+  fields: [{ n: 'nombre', l: 'Nombre del local', req: true }, { n: 'telefono', l: 'Teléfono', req: true }, { n: 'direccion', l: 'Dirección (según partida registral)', req: true, full: true }, { n: 'correo', l: 'Correo', t: 'email' }, { n: 'horario', l: 'Horario de atención' }, { n: 'lat', l: 'Latitud', t: 'number', step: 'any', hint: 'Opcional: completa solo con coordenadas verificadas.' }, { n: 'lng', l: 'Longitud', t: 'number', step: 'any' }, { n: 'mapa', l: 'Vista previa de la ubicación', t: 'custom', render: w => `<iframe class="map" style="height:220px" title="Vista previa del mapa" src="https://maps.google.com/maps?q=${encodeURIComponent(w.direccion || inst().direccion)}&output=embed"></iframe><button type="button" class="btn xs sec" data-mapr style="margin-top:6px">Actualizar vista previa con las coordenadas ingresadas</button>`, bind: (w, box, rer) => { $('[data-mapr]', box).onclick = () => rer(); } }, { n: 'foto', l: 'Foto del acceso principal', t: 'image', full: true }, { n: 'orden', l: 'Orden', t: 'number', side: true, min: 1 }],
   validate: w => (w.lat < -18.5 || w.lat > 0 || w.lng < -82 || w.lng > -68) ? { lat: 'Coordenadas fuera del territorio peruano.' } : {},
 };
 SPECS.reconocimientos = {
@@ -6002,7 +6002,7 @@ SPECS.programas = {
     { n: 'duracion', l: 'Duración', pubReq: true }, { n: 'modalidad', l: 'Modalidad', t: 'select', pubReq: true, opts: ['Presencial', 'Semipresencial', 'A distancia'] }, { n: 'turno', l: 'Turno', pubReq: true, ph: 'Mañana / Tarde / Mañana y tarde' }, { n: 'horario', l: 'Horario', pubReq: true }, { n: 'titulo', l: 'Título que otorga', full: true },
     { n: 'perfil', l: 'Perfil de egreso', t: 'rich', pubReq: true }, { n: 'campoItems', l: 'Campo laboral (un ámbito por línea)', t: 'lines', full: true, pubReq: true },
     { n: 'modulos', l: 'Malla curricular: módulos profesionales y catálogo de unidades didácticas', t: 'custom', render: w => mallaHTML(w), bind: (w, box, rer) => bindMalla(w, box, rer) },
-    { n: 'malla', l: 'Malla curricular vigente (PDF)', t: 'file', full: true, noRemove: false }, { n: 'brochure', l: 'Brochure vigente (PDF)', t: 'file', full: true },
+    { n: 'malla', l: 'Itinerario formativo publicado (2024) (PDF)', t: 'file', full: true, noRemove: false }, { n: 'brochure', l: 'Brochure vigente (PDF)', t: 'file', full: true },
     { n: 'coordinadorId', l: 'Coordinador(a) del programa', t: 'select', opts: w => alive('personas').filter(p => (p.programas || []).includes(w.id)).map(p => [p.id, `${p.apellidos}, ${p.nombres}`]), hint: 'Solo docentes asociados a este programa.' }, { n: 'coordinadorMsg', l: 'Mensaje del coordinador', t: 'textarea' },
     { n: 'convenios', l: 'Convenios para EFSRT (uno por línea)', t: 'lines', full: true },
     { n: 'egr', l: 'Egresados', t: 'info', html: w => `Los egresados y testimonios se administran en <a href="#/admin/egresados">Egresados</a> (${alive('egresados').filter(e => e.programaId === w.id).length} registrados). La plana docente se toma de <a href="#/admin/docentes">Plana docente</a>.` },
@@ -6057,7 +6057,7 @@ SPECS.becas = {
   canEdit: r => !perClosed(r.periodoId) || canFlag('closePeriod'), canDelete: r => !perClosed(r.periodoId) || canFlag('closePeriod'),
   exportCSV: { head: ['Periodo', 'Apellidos', 'Nombres', 'DNI', 'Programa', 'Tipo de beca', 'Motivo', 'Estado'], row: r => [perLabel(r.periodoId), r.apellidos, r.nombres, canFlag('viewDni') ? r.dni : maskDni(r.dni), (byId('programas', r.programaId) || {}).nombre, (byId('tiposBeca', r.tipoId) || {}).nombre, r.motivo, r.estado] },
   defaults: () => ({ periodoId: (coll('becasPeriodos').find(p => p.vigente) || {}).id || '', estado: 'Publicado' }),
-  fields: [{ n: 'periodoId', l: 'Periodo de becas', t: 'select', req: true, opts: () => coll('becasPeriodos').filter(p => p.estado !== 'Cerrado' || canFlag('closePeriod')).map(p => [p.id, `${p.anio} - ${p.periodo}`]) }, { n: 'dni', l: 'DNI (opcional, privado)', max: 8 }, { n: 'apellidos', l: 'Apellidos', req: true }, { n: 'nombres', l: 'Nombres', req: true }, { n: 'programaId', l: 'Programa de estudio', t: 'select', req: true, opts: progOpts }, { n: 'tipoId', l: 'Tipo de beca', t: 'select', req: true, opts: () => coll('tiposBeca').filter(t => t.estado === 'Activo').map(t => [t.id, t.nombre]) }, { n: 'motivo', l: 'Motivo o descripción', full: true }],
+  fields: [{ n: 'periodoId', l: 'Periodo de becas', t: 'select', req: true, opts: () => coll('becasPeriodos').filter(p => p.estado !== 'Cerrado' || canFlag('closePeriod')).map(p => [p.id, `${p.anio} - ${p.periodo}`]) }, { n: 'dni', l: 'DNI (opcional, privado)', max: 8 }, { n: 'apellidos', l: 'Apellidos', hint: 'Si la fuente no los desglosa, conserva el nombre completo en Nombres.' }, { n: 'nombres', l: 'Nombres', req: true }, { n: 'programaId', l: 'Programa de estudio', t: 'select', req: true, opts: progOpts }, { n: 'tipoId', l: 'Tipo de beca', t: 'select', req: true, opts: () => coll('tiposBeca').filter(t => t.estado === 'Activo').map(t => [t.id, t.nombre]) }, { n: 'motivo', l: 'Motivo o descripción', full: true }],
   validate: w => { const e = {}; if (!/^\d{8}$/.test(w.dni)) e.dni = 'El DNI debe tener 8 dígitos numéricos.'; const d = alive('becarios').find(b => b.id !== w.id && b.dni === w.dni && b.periodoId === w.periodoId && b.programaId === w.programaId && b.tipoId === w.tipoId); if (d) e.dni = 'Este beneficiario ya está registrado con el mismo periodo, programa y tipo de beca.'; else { const near = alive('becarios').find(b => b.id !== w.id && b.dni === w.dni && b.periodoId === w.periodoId); if (near) toast(`Advertencia: el DNI ya tiene otra beca en el mismo periodo (${(byId('tiposBeca', near.tipoId) || {}).nombre}).`); } if (perClosed(w.periodoId) && !canFlag('closePeriod')) e.periodoId = 'El periodo está cerrado.'; return e; },
 };
 SPECS.becasper = {
@@ -6145,7 +6145,7 @@ SPECS.admision = {
     { n: 'subtitulo', l: 'Subtítulo', full: true }, { n: 'descripcion', l: 'Descripción o mensaje introductorio', t: 'textarea', full: true },
     { n: 'prospecto', l: 'Prospecto de admisión', t: 'file', hint: 'El archivo heredado es un temario de 2025. Sustitúyalo por el prospecto aprobado del proceso correspondiente.' }, { n: 'reglamento', l: 'Reglamento de admisión', t: 'file', hint: 'Se muestra también en Documentos de Gestión (referencia).' },
     { n: 'resultados', l: 'Resultados por programa de estudio y turno', t: 'custom', render: resHTML, bind: bindRes },
-    { n: 'vacantes', l: 'Vacantes por programa y turno', t: 'custom', render: x => `<div class="tbl-wrap"><table class="tbl light subtbl"><thead><tr><th>Programa</th><th style="width:110px">Mañana</th><th style="width:110px">Tarde</th></tr></thead><tbody>${sortO(alive('programas')).map(p => `<tr><td>${esc(p.nombre)}</td>${['M', 'T'].map(t => `<td><input class="inp" type="number" min="0" value="${((x.vacantes || {})[p.id] || {})[t] || ''}" data-vac="${p.id}|${t}" aria-label="Vacantes ${t === 'M' ? 'mañana' : 'tarde'} ${esc(p.nombre)}"></td>`).join('')}</tr>`).join('')}</tbody></table></div>`, bind: (x, box) => $$('[data-vac]', box).forEach(i => i.oninput = () => { const [p, t] = i.dataset.vac.split('|'); x.vacantes = x.vacantes || {}; x.vacantes[p] = x.vacantes[p] || {}; x.vacantes[p][t] = i.value === '' ? 0 : +i.value; }) },
+    { n: 'vacantes', l: 'Vacantes por programa y turno', t: 'custom', render: x => `<div class="tbl-wrap"><table class="tbl light subtbl"><thead><tr><th>Programa</th><th style="width:110px">Mañana</th><th style="width:110px">Tarde</th><th style="width:110px">Noche</th><th style="width:110px">Total publicado</th></tr></thead><tbody>${sortO(alive('programas')).map(p => `<tr><td>${esc(p.nombre)}</td>${['M', 'T', 'N', 'total'].map(t => `<td><input class="inp" type="number" min="0" value="${((x.vacantes || {})[p.id] || {})[t] || ''}" data-vac="${p.id}|${t}" aria-label="Vacantes ${({M:'mañana',T:'tarde',N:'noche',total:'total publicado'})[t]} ${esc(p.nombre)}"></td>`).join('')}</tr>`).join('')}</tbody></table></div>`, bind: (x, box) => $$('[data-vac]', box).forEach(i => i.oninput = () => { const [p, t] = i.dataset.vac.split('|'); x.vacantes = x.vacantes || {}; x.vacantes[p] = x.vacantes[p] || {}; x.vacantes[p][t] = i.value === '' ? 0 : +i.value; }) },
     { n: 'cronograma', l: 'Cronograma', t: 'rows', cols: [{ n: 'actividad', l: 'Actividad' }, { n: 'fecha', l: 'Fecha(s)' }] },
     { n: 'requisitos', l: 'Requisitos (uno por línea)', t: 'lines', full: true },
     { n: 'modalidades', l: 'Modalidades de admisión', t: 'rows', cols: [{ n: 'nombre', l: 'Modalidad' }, { n: 'detalle', l: 'Detalle' }] },
@@ -6155,7 +6155,7 @@ SPECS.admision = {
   afterSave: w => { if (w.vigente && w.estado === 'Publicado') coll('admisiones').forEach(a => { if (a.id !== w.id && a.vigente) { a.vigente = false; stamp(a); } }); if (w.estado === 'Cerrado') w.vigente = false; },
 };
 function resHTML(w) {
-  return `<div class="notice" style="margin-top:0">Cargue un archivo solo para los turnos que correspondan. El botón “Ver Resultados” aparece en el portal únicamente cuando existe el archivo.</div><div class="tbl-wrap"><table class="tbl light subtbl"><thead><tr><th>N.º</th><th>Programa de estudio</th><th>Resultado turno mañana</th><th>Resultado turno tarde</th></tr></thead><tbody>${sortO(alive('programas')).map((p, i) => `<tr><td>${i + 1}</td><td>${esc(p.nombre)}</td>${['M', 'T'].map(t => { const r = ((w.resultados || {})[p.id] || {})[t]; return `<td style="min-width:200px">${r ? `<span class="file-chip"><span class="ft">PDF</span>${esc(clamp(r.original || r.nombre, 26))}</span><div style="display:flex;gap:4px;margin-top:4px"><button type="button" class="btn xs ghost" data-rv="${p.id}|${t}">Ver</button><label class="btn xs sec" style="cursor:pointer">Reemplazar<input type="file" accept=".pdf" hidden data-rr="${p.id}|${t}"></label><button type="button" class="btn xs ghost" data-rx="${p.id}|${t}">Retirar</button></div>` : `<label class="btn xs ghost" style="cursor:pointer">${ic('upload').replace('<svg', '<svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"')} Cargar PDF<input type="file" accept=".pdf" hidden data-rr="${p.id}|${t}"></label>`}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>${(w.historial || []).length ? `<details style="margin-top:8px"><summary style="cursor:pointer;font-size:13px">Historial de resultados reemplazados o retirados (${w.historial.length})</summary><ul style="font-size:12.5px">${w.historial.map(h => `<li>${fshort(h.fecha, true)} · ${esc(h.accion)} · ${esc(h.programa)} turno ${h.turno === 'M' ? 'mañana' : 'tarde'} · ${esc(h.archivo)} · ${esc(h.por)}</li>`).join('')}</ul></details>` : ''}`;
+  return `<div class="notice" style="margin-top:0">Cargue un archivo solo para los turnos que correspondan. El botón “Ver Resultados” aparece en el portal únicamente cuando existe el archivo.</div><div class="tbl-wrap"><table class="tbl light subtbl"><thead><tr><th>N.º</th><th>Programa de estudio</th><th>Resultado turno mañana</th><th>Resultado turno noche</th></tr></thead><tbody>${sortO(alive('programas')).map((p, i) => `<tr><td>${i + 1}</td><td>${esc(p.nombre)}</td>${['M', 'T'].map(t => { const r = ((w.resultados || {})[p.id] || {})[t]; return `<td style="min-width:200px">${r ? `<span class="file-chip"><span class="ft">PDF</span>${esc(clamp(r.original || r.nombre, 26))}</span><div style="display:flex;gap:4px;margin-top:4px"><button type="button" class="btn xs ghost" data-rv="${p.id}|${t}">Ver</button><label class="btn xs sec" style="cursor:pointer">Reemplazar<input type="file" accept=".pdf" hidden data-rr="${p.id}|${t}"></label><button type="button" class="btn xs ghost" data-rx="${p.id}|${t}">Retirar</button></div>` : `<label class="btn xs ghost" style="cursor:pointer">${ic('upload').replace('<svg', '<svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"')} Cargar PDF<input type="file" accept=".pdf" hidden data-rr="${p.id}|${t}"></label>`}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>${(w.historial || []).length ? `<details style="margin-top:8px"><summary style="cursor:pointer;font-size:13px">Historial de resultados reemplazados o retirados (${w.historial.length})</summary><ul style="font-size:12.5px">${w.historial.map(h => `<li>${fshort(h.fecha, true)} · ${esc(h.accion)} · ${esc(h.programa)} turno ${h.turno === 'M' ? 'mañana' : 'tarde'} · ${esc(h.archivo)} · ${esc(h.por)}</li>`).join('')}</ul></details>` : ''}`;
 }
 function bindRes(w, box, rer) {
   w.resultados = w.resultados || {}; w.historial = w.historial || [];
@@ -6164,12 +6164,12 @@ function bindRes(w, box, rer) {
   $$('[data-rr]', box).forEach(inp => inp.onchange = () => editorFileTask(inp, async () => {
     const f = inp.files[0]; if (!f) return; const [p, t] = inp.dataset.rr.split('|'); const er = checkFile(f, 'pdf'); if (er) return toast(er, 'err');
     const cur = (w.resultados[p] || {})[t];
-    if (cur && !await confirmBox(`Ya existe un resultado para ${esc(pn(p))} – turno ${t === 'M' ? 'mañana' : 'tarde'}. ¿Reemplazarlo? El anterior quedará en el historial.`, { ok: 'Reemplazar', danger: false })) { inp.value = ''; return; }
+    if (cur && !await confirmBox(`Ya existe un resultado para ${esc(pn(p))} – turno ${({M:'mañana',T:'tarde',N:'noche',total:'total publicado'})[t]}. ¿Reemplazarlo? El anterior quedará en el historial.`, { ok: 'Reemplazar', danger: false })) { inp.value = ''; return; }
     const file = await portalUpload(f); if (ADM.work !== w) return;
     if (cur) w.historial.unshift({ fecha: nowISO(), accion: 'Reemplazo', programa: pn(p), turno: t, archivo: cur.original || cur.nombre, por: currentUser().usuario });
     w.resultados[p] = w.resultados[p] || {}; w.resultados[p][t] = {...file,fecha:nowISO(),por:currentUser().usuario}; rer();
   }));
-  $$('[data-rx]', box).forEach(b => b.onclick = async () => { const [p, t] = b.dataset.rx.split('|'); if (!await confirmBox(`¿Retirar el resultado de ${esc(pn(p))} – turno ${t === 'M' ? 'mañana' : 'tarde'}? El botón dejará de mostrarse en el portal.`, { ok: 'Retirar' })) return; const cur = w.resultados[p][t]; w.historial.unshift({ fecha: nowISO(), accion: 'Retiro', programa: pn(p), turno: t, archivo: cur.original || cur.nombre, por: currentUser().usuario }); delete w.resultados[p][t]; rer(); });
+  $$('[data-rx]', box).forEach(b => b.onclick = async () => { const [p, t] = b.dataset.rx.split('|'); if (!await confirmBox(`¿Retirar el resultado de ${esc(pn(p))} – turno ${({M:'mañana',T:'tarde',N:'noche',total:'total publicado'})[t]}? El botón dejará de mostrarse en el portal.`, { ok: 'Retirar' })) return; const cur = w.resultados[p][t]; w.historial.unshift({ fecha: nowISO(), accion: 'Retiro', programa: pn(p), turno: t, archivo: cur.original || cur.nombre, por: currentUser().usuario }); delete w.resultados[p][t]; rer(); });
 }
 /* ---------- Matrícula ---------- */
 const SECC = [['costos', 'Costos de matrícula', 'money'], ['ingresantes', 'Matrícula de ingresantes', 'user'], ['ratificacion', 'Ratificación de matrícula', 'restore']];
@@ -6907,8 +6907,8 @@ document.addEventListener('DOMContentLoaded', init);
 
 </script>
 <script>
-/* ==== pisco.js ==== Portal Web IESTP CHINCHA 2026 */
-var PISCO_LOGO = "/assets/chincha/logo-chincha-347d9598.webp";
+/* ==== pisco.js ==== Portal Web IESTP NASCA 2026 */
+var PISCO_LOGO = "/assets/nasca/logo-cb57ab132d.png";
 (function () {
 'use strict';
 /* =========================================================
@@ -6928,7 +6928,7 @@ function pzEnsure() {
   if (!DB || !DB.config) return;
   const c = DB.config; c.contadores = c.contadores || {};
   ['LR', 'EXP', 'MPV', 'DOC', 'RCL'].forEach(k => { c.contadores[k] = c.contadores[k] || {}; });
-  c.mpv = Object.assign({ horaIni: '08:00', horaFin: '15:40', dias: 'Lunes a viernes', maxMB: 40, maxArchivos: 5, tipos: MPV_TIPOS.slice(), formatos: MPV_FORMATOS.map(f => f[0]), feriados: FERIADOS_2026.slice(), plazos: Object.assign({}, MPV_PLAZOS), correo: 'direcciongeneral@iestpchincha.edu.pe', telefono: '056-480141', prefijo: 'MPV-IESTPCH' }, c.mpv || {});
+  c.mpv = Object.assign({ horaIni: '08:00', horaFin: '15:40', dias: 'Lunes a viernes', maxMB: 40, maxArchivos: 5, tipos: MPV_TIPOS.slice(), formatos: MPV_FORMATOS.map(f => f[0]), feriados: FERIADOS_2026.slice(), plazos: Object.assign({}, MPV_PLAZOS), correo: 'mesapartes2020@istpnasca.edu.pe', telefono: '056-522681', prefijo: 'MPV-IESTPN' }, c.mpv || {});
   c.lr = Object.assign({}, LR_DEF, c.lr || {});
   c.bolsa = Object.assign({}, BOLSA_DEF, c.bolsa || {});
   Object.assign(EXP_PLAZOS, c.mpv.plazos);
@@ -7286,7 +7286,7 @@ expDetalle = function (id) {
 };
 function mpvAreasAdm() {
   const as = areasAll();
-  const html = admHead('Mesa de partes virtual', 'Relación de áreas receptoras, responsables y correos institucionales (@www.iestpchincha.edu.pe). Las derivaciones se notifican a estos correos.', can('ix-config') ? `<a class="btn" href="#/admin/ix-config">${sic('edit')} Editar áreas</a>` : '', 'inbox', [['Mesa de partes', '#/admin/expedientes'], ['Áreas receptoras']]) + mpTabs('a')
+  const html = admHead('Mesa de partes virtual', 'Relación de áreas receptoras, responsables y correos institucionales (@istpnasca.edu.pe). Las derivaciones se notifican a estos correos.', can('ix-config') ? `<a class="btn" href="#/admin/ix-config">${sic('edit')} Editar áreas</a>` : '', 'inbox', [['Mesa de partes', '#/admin/expedientes'], ['Áreas receptoras']]) + mpTabs('a')
     + `<div class="panel"><div class="tbl-wrap" style="border:0"><table class="tbl light"><thead><tr><th>Nivel / clasificación</th><th>Código</th><th>Área / cargo / órgano</th><th>Responsable</th><th>Correo corporativo</th><th class="c">Expedientes abiertos</th><th class="c">Estado</th></tr></thead><tbody>${NIVELES.map(n => as.filter(a => (a.nivel || 'Áreas') === n).map((a, i, g) => `<tr>${i === 0 ? `<td rowspan="${g.length}" style="font-weight:700;vertical-align:middle">${esc(n)}</td>` : ''}<td class="mono">${esc(a.cod)}</td><td>${esc(a.nombre)}</td><td>${esc(a.resp)}</td><td><a href="mailto:${esc(a.correo)}">${esc(a.correo)}</a></td><td class="c">${coll('expedientes').filter(x => x.area === a.cod && !['Atendido', 'Archivado'].includes(x.estado)).length}</td><td class="c">${stBadge(a.activo ? 'Activo' : 'Inactivo')}</td></tr>`).join('')).join('')}</tbody></table></div><p class="note" style="padding:0 16px 14px">Las áreas se administran en Configuración académica › Áreas receptoras; los cambios se reflejan en el formulario público y en las derivaciones.</p></div>`;
   return { html };
 }
@@ -7331,7 +7331,7 @@ function lrForm() {
      <div class="field"><label for="l2-nd">Número de documento <span class="req">*</span></label><input id="l2-nd" name="numDoc" maxlength="12" placeholder="Ingrese su documento" autocomplete="off"></div>
      <div class="field"><label for="l2-no">Nombres <span class="req">*</span></label><input id="l2-no" name="nombresP" maxlength="80" placeholder="Ingrese sus nombres" autocomplete="given-name"></div>
      <div class="field"><label for="l2-ap">Apellidos <span class="req">*</span></label><input id="l2-ap" name="apellidos" maxlength="80" placeholder="Ingrese sus apellidos" autocomplete="family-name"></div>
-     <div class="field"><label for="l2-e">Correo electrónico <span class="req">*</span></label><input id="l2-e" name="correo" type="email" maxlength="120" placeholder="direcciongeneral@iestpchincha.edu.pe" autocomplete="email"></div>
+     <div class="field"><label for="l2-e">Correo electrónico <span class="req">*</span></label><input id="l2-e" name="correo" type="email" maxlength="120" placeholder="mesapartes2020@istpnasca.edu.pe" autocomplete="email"></div>
      <div class="field"><label for="l2-t">Teléfono</label><input id="l2-t" name="telefono" maxlength="15" inputmode="tel" placeholder="999 999 999" autocomplete="tel"></div>
      <div class="field"><label for="l2-c">Condición del usuario <span class="req">*</span></label><select id="l2-c" name="condicion"><option value="">Seleccione</option>${LR_COND.map(x => `<option>${x}</option>`).join('')}</select></div>
      <div class="field"><label for="l2-p">Programa de estudios</label><select id="l2-p" name="programaId"><option value="">Seleccione</option>${progs().map(p => `<option value="${p.id}">${esc(p.nombre)}</option>`).join('')}<option value="ninguno">No corresponde</option></select></div>
@@ -7634,7 +7634,7 @@ async function readSheet(file) {
   const h = cells(lines[0]); return lines.slice(1).map(l => { const c = cells(l); const o = {}; h.forEach((k, i) => o[k] = c[i] || ''); return o; });
 }
 function padronTemplate() {
-  const rows = [PADRON_COLS, ['70000001', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Egresado', '15/03/2000', 'direcciongeneral@iestpchincha.edu.pe', 'Av. Ejemplo 123, Ica', '900000001', 'Arquitectura de Plataformas y Servicios de Tecnologías de Información', '2024', 'Empresa de ejemplo S.A.C.', 'Soporte técnico'], ['70000002', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Por Concluir', '02/08/2004', '', '', '900000002', 'Contabilidad', '', '', '']];
+  const rows = [PADRON_COLS, ['70000001', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Egresado', '15/03/2000', 'mesapartes2020@istpnasca.edu.pe', 'Av. Ejemplo 123, Ica', '900000001', 'Arquitectura de Plataformas y Servicios de Tecnologías de Información', '2024', 'Empresa de ejemplo S.A.C.', 'Soporte técnico'], ['70000002', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Por Concluir', '02/08/2004', '', '', '900000002', 'Contabilidad', '', '', '']];
   if (window.XLSX) { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(rows); ws['!cols'] = PADRON_COLS.map((c, i) => ({ wch: [10, 38, 14, 14, 26, 30, 12, 50, 12, 28, 18][i] })); XLSX.utils.book_append_sheet(wb, ws, 'Padron'); const ins = XLSX.utils.aoa_to_sheet([['Instrucciones de llenado'], ['DNI: 8 dígitos (obligatorio).'], ['Apellidos y Nombres: obligatorio.'], ['Condición: Egresado, Titulado o Por Concluir (estudiante).'], ['Programa de Estudio: ASHR, APSTI (o Computación e Informática), Contabilidad, Enfermería Técnica, Producción Agropecuaria.'], ['Fecha de nacimiento: DD/MM/AAAA. Celular: 9 dígitos.'], ['Si el DNI ya existe se actualizan sus datos; si no, se registra.']]); XLSX.utils.book_append_sheet(wb, ins, 'Instrucciones'); downloadBlob(new Blob([XLSX.write(wb, { type: 'array', bookType: 'xlsx' })], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'plantilla_padron_estudiantes_egresados.xlsx'); }
   else downloadText(toCSV(rows), 'plantilla_padron_estudiantes_egresados.csv', 'text/csv');
 }
@@ -8276,121 +8276,7 @@ if (typeof SPECS === 'object' && SPECS.certificados) { const tb = SPECS.certific
 })();
 
 
-/* =========================================================
-   DATOS E IMÁGENES DE DEMOSTRACIÓN — IESTP CHINCHA
-   Las imágenes del portal son ilustraciones genéricas; si un recurso externo no carga,
-   se reemplazan por una imagen institucional generada.
-   ========================================================= */
-const OF_URL = 'https://www.iestpchincha.edu.pe';
-const OF_IMG = OF_URL + '/assets/img/';
-const ofFoto = f => img('ph:person:m|' + f.replace(/\.svg$/, ''));
-/* Si una imagen del sitio oficial no carga, se usa una imagen generada */
-document.addEventListener('error', e => {
-  const t = e.target; if (!t || t.tagName !== 'IMG' || t.dataset.fb || !/^https?:/.test(t.getAttribute('src') || '')) return;
-  t.dataset.fb = '1'; const s = t.getAttribute('src');
-  t.src = /\/docentes\//.test(s) ? img('ph:topic:user|' + s.length + '|') : img('ph:campus:' + (s.length % 7 + 1));
-}, true);
-
-const OF_PROG = {
-  ashr: 'Administración de Servicios de Hostelería y Restaurantes', apsti: 'Arquitectura de Plataformas y Servicios de Tecnologías de la Información',
-  cont: 'Contabilidad', enf: 'Enfermería Técnica', pa: 'Producción Agropecuaria', emp: 'Empleabilidad y cursos transversales',
-};
-/* [id, nombres, apellidos, título, programas, foto] — Plana docente publicada en /vista/docente */
-const OF_DOC = [
-  ["dir", "Profesional de Ejemplo", "01", "Mg.", ["ashr"], "profesional-01.svg"],
-  ["a1", "Profesional de Ejemplo", "02", "Mg.", ["ashr"], "profesional-02.svg"],
-  ["a2", "Profesional de Ejemplo", "03", "Mg.", ["ashr"], "profesional-03.svg"],
-  ["a3", "Profesional de Ejemplo", "04", "Ing.", ["apsti"], "profesional-04.svg"],
-  ["a4", "Profesional de Ejemplo", "05", "Mg.", ["apsti"], "profesional-05.svg"],
-  ["d1", "Profesional de Ejemplo", "06", "", ["ashr"], "profesional-06.svg"],
-  ["d2", "Profesional de Ejemplo", "07", "", ["ashr"], "profesional-07.svg"],
-  ["d3", "Profesional de Ejemplo", "08", "", ["ashr"], "profesional-08.svg"],
-  ["d5", "Profesional de Ejemplo", "09", "", ["ashr"], "profesional-09.svg"],
-  ["d6", "Profesional de Ejemplo", "10", "CPC.", ["ashr"], "profesional-10.svg"],
-  ["d7", "Profesional de Ejemplo", "11", "", ["ashr"], "profesional-11.svg"],
-  ["d8", "Profesional de Ejemplo", "12", "", ["ashr"], "profesional-12.svg"],
-  ["d9", "Profesional de Ejemplo", "13", "", ["ashr"], "profesional-13.svg"],
-  ["d10", "Profesional de Ejemplo", "14", "", ["ashr"], "profesional-14.svg"],
-  ["d11", "Profesional de Ejemplo", "15", "", ["ashr"], "profesional-15.svg"],
-  ["d12", "Profesional de Ejemplo", "16", "Ing.", ["apsti", "cont"], "profesional-16.svg"],
-  ["d13", "Profesional de Ejemplo", "17", "", ["apsti"], "profesional-17.svg"],
-  ["d14", "Profesional de Ejemplo", "18", "", ["apsti"], "profesional-18.svg"],
-  ["d15", "Profesional de Ejemplo", "19", "Mg.", ["apsti"], "profesional-19.svg"],
-  ["d16", "Profesional de Ejemplo", "20", "Psic.", ["apsti"], "profesional-20.svg"],
-  ["d17", "Profesional de Ejemplo", "21", "", ["apsti"], "profesional-21.svg"],
-  ["d18", "Profesional de Ejemplo", "22", "", ["apsti"], "profesional-22.svg"],
-  ["d19", "Profesional de Ejemplo", "23", "", ["apsti"], "profesional-23.svg"],
-  ["d20", "Profesional de Ejemplo", "24", "", ["cont"], "profesional-24.svg"],
-  ["d21", "Profesional de Ejemplo", "25", "", ["cont"], "profesional-25.svg"],
-  ["d22", "Profesional de Ejemplo", "26", "", ["cont"], "profesional-26.svg"],
-  ["d23", "Profesional de Ejemplo", "27", "CPC.", ["cont"], "profesional-27.svg"],
-  ["d24", "Profesional de Ejemplo", "28", "", ["cont"], "profesional-28.svg"],
-  ["d25", "Profesional de Ejemplo", "29", "", ["cont"], "profesional-29.svg"],
-  ["d26", "Profesional de Ejemplo", "30", "CPC.", ["cont"], "profesional-30.svg"],
-  ["d27", "Profesional de Ejemplo", "31", "", ["cont"], "profesional-31.svg"],
-  ["d28", "Profesional de Ejemplo", "32", "", ["cont"], "profesional-32.svg"],
-  ["d29", "Profesional de Ejemplo", "33", "", ["cont"], "profesional-33.svg"],
-  ["d30", "Profesional de Ejemplo", "34", "Mg.", ["enf"], "profesional-34.svg"],
-  ["d31", "Profesional de Ejemplo", "35", "", ["enf"], "profesional-35.svg"],
-  ["d32", "Profesional de Ejemplo", "36", "", ["enf"], "profesional-36.svg"],
-  ["d33", "Profesional de Ejemplo", "37", "", ["enf"], "profesional-37.svg"],
-  ["d34", "Profesional de Ejemplo", "38", "", ["enf"], "profesional-38.svg"],
-  ["d35", "Profesional de Ejemplo", "39", "", ["enf"], "profesional-39.svg"],
-  ["d36", "Profesional de Ejemplo", "40", "", ["enf"], "profesional-40.svg"],
-  ["d37", "Profesional de Ejemplo", "41", "", ["enf"], "profesional-41.svg"],
-  ["d38", "Profesional de Ejemplo", "42", "", ["enf"], "profesional-42.svg"],
-  ["d39", "Profesional de Ejemplo", "43", "", ["pa"], "profesional-43.svg"],
-  ["d40", "Profesional de Ejemplo", "44", "M.V.", ["pa"], "profesional-44.svg"],
-  ["d41", "Profesional de Ejemplo", "45", "", ["pa"], "profesional-45.svg"],
-  ["d42", "Profesional de Ejemplo", "46", "", ["pa"], "profesional-46.svg"],
-  ["d43", "Profesional de Ejemplo", "47", "", ["pa"], "profesional-47.svg"],
-  ["d44", "Profesional de Ejemplo", "48", "", [], "profesional-48.svg"],
-  ["d45", "Profesional de Ejemplo", "49", "", [], "profesional-49.svg"],
-  ["d46", "Profesional de Ejemplo", "50", "", [], "profesional-50.svg"],
-  ["d47", "Profesional de Ejemplo", "51", "", [], "profesional-51.svg"]
-];
-/* Equipo directivo publicado en /vista/plana-jerarquica: [personaId, cargo, órgano/unidad, correo institucional del área] */
-const OF_JER = [
-  ['dir', 'Director General', 'Dirección General', 'direcciongeneral@www.iestpchincha.edu.pe'],
-  ['a1', 'Jefa de Unidad Académica', 'Jefatura de Unidad Académica', 'unidadacademica@www.iestpchincha.edu.pe'],
-  ['a2', 'Jefa de Área de Administración', 'Jefatura de Área de Administración', 'administracion@www.iestpchincha.edu.pe'],
-  ['a3', 'Secretario Académico', 'Secretaría Académica', 'secretariaacademica@www.iestpchincha.edu.pe'],
-  ['d14', 'Jefe de Unidad de Formación Continua', 'Jefatura de Unidad de Formación Continua', 'formacioncontinua@www.iestpchincha.edu.pe'],
-  ['d23', 'Jefe de Área de Calidad', 'Coordinación de Área de Calidad', 'calidad@www.iestpchincha.edu.pe'],
-  ['d16', 'Jefa de Unidad de Bienestar y Empleabilidad', 'Jefatura de Unidad de Bienestar y Empleabilidad', 'bienestaryempleabilidad@www.iestpchincha.edu.pe'],
-  ['d15', 'Jefe de Unidad de Investigación', 'Jefatura de Unidad de Investigación', 'investigacion@www.iestpchincha.edu.pe'],
-];
-const OF_COORD = { apsti: ['d12', 'coordinacion.apsti@www.iestpchincha.edu.pe'], enf: ['d30', 'coordinacion.enfermeria@www.iestpchincha.edu.pe'], ashr: ['d6', 'coordinacion.ashr@www.iestpchincha.edu.pe'], cont: ['d26', 'coordinacion.contabilidad@www.iestpchincha.edu.pe'], pa: ['d40', 'coordinacion.agropecuaria@www.iestpchincha.edu.pe'] };
-/* Programas de estudio: imagen, módulos, perfil y campo laboral publicados en /vista/<programa> */
-const OF_PROGS = {
-  apsti: { nombre: OF_PROG.apsti, img: 'carrera/aptic.png', mods: ['Soporte, mantenimiento y seguridad de sistemas informáticos', 'Desarrollo y puesta en producción de sistemas informáticos', 'Diseño de aplicaciones web y plataforma TI'],
-    perfil: 'Implementa y administra infraestructuras de TI, realiza el mantenimiento y la reparación de equipos de cómputo, instala y configura redes, administra servidores, analiza, diseña y desarrolla sistemas de información, administra bases de datos y desarrolla productos multimedia y aplicaciones web adaptativas. Se comunica de manera efectiva, emprende e innova, y actúa con ética en la solución de problemas.',
-    campo: 'Soporte técnico y helpdesk|Tecnologías de la información|Calidad de software|Consultoría y capacitación en TI|Desarrollo de sistemas|Innovación tecnológica|Administración de redes|Administración de bases de datos' },
-  ashr: { img: 'carrera/ASHR-1.png', mods: ['Administración de Hostelería', 'Administración de Insumos, Alimentos y Bebidas', 'Administración Financiera y del Marketing de Hostelería'],
-    perfil: 'Gestiona la recepción y salida de insumos hoteleros y dirige las compras de alimentos y bebidas; administra los recursos humanos y financieros, promociona el establecimiento y aplica la normativa vigente. Actúa con ética, innovación y espíritu emprendedor, y trabaja en equipo respetando el medio ambiente.',
-    campo: 'Reservas y recepción|Alojamiento y housekeeping|Alimentos y bebidas|Lavandería|Animación y recreación hotelera|Administración de establecimientos hoteleros|Restaurantes: cocina, comedor, almacenes y administración' },
-  cont: { img: 'carrera/contabilidad.png', mods: ['Desarrollo y Actualización de Procesos Contables', 'Supervisión de Operaciones Contables', 'Gestión de Estados Financieros'],
-    perfil: 'Desarrolla y supervisa operaciones contables y financieras, elabora el estado de situación financiera de las organizaciones y actualiza los procedimientos según las normas vigentes. Se comunica en inglés, usa tecnologías de la información, actúa con ética, promueve la innovación y el emprendimiento, y trabaja en equipo cuidando el ambiente.',
-    campo: 'Contabilidad y contabilidad financiera|Finanzas y análisis financiero|Auditoría|Tributación|Préstamos y cobranzas|Costos y presupuestos|Logística y almacenes|Recursos humanos|Proyectos de inversión|Tesorería' },
-  enf: { img: 'carrera/enfermeria.png', mods: ['Asistencia en promoción y prevención de la salud', 'Asistencia en la atención básica de la salud', 'Asistencia en la atención integral de la salud'],
-    perfil: 'Realiza actividades de promoción y prevención de la salud y asiste en la atención de las necesidades básicas de salud de la persona, la familia y la comunidad. Se comunica de manera efectiva, usa el inglés y las tecnologías de la información, y actúa con ética, siguiendo protocolos y normas, con respeto por el medio ambiente.',
-    campo: 'Subgerencias de salud de los municipios (agente comunitario)|Tópicos y consultorios de enfermería|Tópico en Cuna Más|Cuidado de pacientes con enfermedades terminales|Ayuda diagnóstica y laboratorio|Salud ocupacional|Centro quirúrgico|Digitación SIS|Fisioterapia y rehabilitación' },
-  pa: { img: 'carrera/agro.png', mods: ['Producción de cultivos agrícolas', 'Procesos de producción pecuaria', 'Prevención, manejo y control sanitario'],
-    perfil: 'Dirige procesos de producción agrícola y pecuaria, y previene y controla plagas y enfermedades. Gestiona la parte administrativa y comercial con comunicación efectiva, inglés e informática, y lidera proyectos y emprendimientos agropecuarios con responsabilidad social, trabajo en equipo y ética.',
-    campo: 'Promoción rural e investigación en cultivos y crianzas|Viveros municipales|Sanidad vegetal y animal|Control fitosanitario y manejo de agroquímicos|Cultivos de agroexportación y poscosecha|Crianza y liberación de organismos benéficos|Manejo ganadero, reproducción e inseminación|Granjas avícolas y centros de engorde' },
-};
-const OF_NEWS = [
-  ["n1", "Inicio del semestre académico 2026-II", "cat5", "2026-09-16T12:00:00", "Inicio del semestre académico 2026-II: actividades de ejemplo para fortalecer la formación y participación de la comunidad educativa.", "ph:topic:cpu|noticia1|COMUNIDAD EDUCATIVA"],
-  ["n2", "Feria de innovación y proyectos estudiantiles", "cat1", "2026-09-05T10:00:00", "Feria de innovación y proyectos estudiantiles: actividades de ejemplo para fortalecer la formación y participación de la comunidad educativa.", "ph:topic:users|noticia2|COMUNIDAD EDUCATIVA"],
-  ["n3", "Taller de orientación para nuevos postulantes", "cat5", "2026-08-28T10:00:00", "Taller de orientación para nuevos postulantes: actividades de ejemplo para fortalecer la formación y participación de la comunidad educativa.", "ph:topic:book|noticia3|COMUNIDAD EDUCATIVA"],
-  ["n4", "Jornada de capacitación docente", "cat5", "2026-01-22T09:00:00", "Jornada de capacitación docente: actividades de ejemplo para fortalecer la formación y participación de la comunidad educativa.", "ph:topic:heart|noticia4|COMUNIDAD EDUCATIVA"],
-  ["n5", "Campaña de bienestar estudiantil", "cat3", "2025-08-21T10:00:00", "Campaña de bienestar estudiantil: actividades de ejemplo para fortalecer la formación y participación de la comunidad educativa.", "ph:topic:grad|noticia5|COMUNIDAD EDUCATIVA"],
-  ["n6", "Convenios para prácticas profesionales", "cat2", "2025-08-21T12:00:00", "Convenios para prácticas profesionales: actividades de ejemplo para fortalecer la formación y participación de la comunidad educativa.", "ph:topic:cpu|noticia6|COMUNIDAD EDUCATIVA"],
-  ["n7", "Actualización de servicios virtuales", "cat2", "2025-08-21T11:00:00", "Actualización de servicios virtuales: actividades de ejemplo para fortalecer la formación y participación de la comunidad educativa.", "ph:topic:users|noticia7|COMUNIDAD EDUCATIVA"],
-  ["n9", "Encuentro de egresados", "cat4", "2026-11-05T09:00:00", "Encuentro de egresados: actividades de ejemplo para fortalecer la formación y participación de la comunidad educativa.", "ph:topic:book|noticia8|COMUNIDAD EDUCATIVA"],
-  ["n10", "Presentación de proyectos de emprendimiento", "cat1", "2026-10-20T09:00:00", "Presentación de proyectos de emprendimiento: actividades de ejemplo para fortalecer la formación y participación de la comunidad educativa.", "ph:topic:heart|noticia9|COMUNIDAD EDUCATIVA"]
-];
-
+/* La identidad y el contenido institucional proceden de PHP/MySQL. */
 window.piscoOficial = function (D) {};
 
 
@@ -8403,7 +8289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     pzEnsure();
     if (IX && IX.db) { const X = IX.db(); let ch = false;
-      X.empresas.forEach((e, i) => { if (!e.fechaReg) { e.fechaReg = new Date(Date.now() - (20 - i * 6) * 86400000).toISOString().slice(0, 10); e.estadoVal = e.validada ? 'Aprobada' : 'Pendiente'; e.tel = e.tel || '056' + (532100 + i * 17); e.dir = e.dir || e.ubic; e.cargoC = e.cargoC || 'Jefe(a) de Recursos Humanos'; ch = true; } });
+
       X.cfg.docs = X.cfg.docs || {};
       if (!X.cfg.docsLogoInit) { const lg = await logoPng(); if (lg) { X.cfg.docs.logoIzq = { src: lg, w: 240, h: 310 }; X.cfg.docsLogoInit = true; ch = true; } }
       if (ch) if(!IX.persist())return false;

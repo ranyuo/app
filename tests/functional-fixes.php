@@ -9,6 +9,10 @@ if(!str_ends_with($config['db_name'],'_test'))throw new RuntimeException('Solo b
 $app=portal_app();$db=$app->db();$n=0;
 function verify(bool $ok,string $message):void {global $n;if(!$ok)throw new RuntimeException($message);$n++;echo "OK $message\n";}
 $seed=json_decode(file_get_contents(dirname(__DIR__).'/portal-private/data/portal.json'),true,flags:JSON_THROW_ON_ERROR);
+// Las variantes heredadas se crean como fixture, sin depender del catálogo actual de Nasca.
+foreach([['4.1','4.1 MATRÍCULA REGULAR','6.- CONSTANCIAS Y CERTIFICADOS'],['10.6','10.6 CURSO DE OFIMÁTICA Y/O EXCEL (PRESENCIAL) - MES 3','12.- ALQUILERES']] as [$code,$label,$category]){
+ $row=$seed['tupa'][0];$row['id']='qa-legacy-'.$code;$row['codigo']=$code;$row['denominacion']=$label;$row['categoria']=$category;$seed['tupa'][]=$row;
+}
 $legacy=$seed;
 foreach($legacy['tupa'] as &$r){
  if($r['codigo']==='4.1')$r['denominacion']='4.1 ATRÍCULA REGULAR';
