@@ -2241,7 +2241,14 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const strip = s => String(s ?? "").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g," ").trim();
 const byId = (arr,id) => arr.find(x => x.id == id) || null;
-const nextId = arr => arr.reduce((m,x) => Math.max(m, x.id||0), 0) + 1;
+// Identidad independiente de las filas que el perfil puede ver. El servidor
+// conserva la comprobación de unicidad y el ámbito de cada nuevo registro.
+const nextId = arr => {
+  const random = new Uint32Array(2); let id;
+  do { crypto.getRandomValues(random); id = (random[0] & 0xfffff) * 4294967296 + random[1]; }
+  while (!id || arr.some(row => row.id === id));
+  return id;
+};
 const prog = id => byId(DB.programas,id) || {cod:"—",nombre:"—"};
 const ud = id => byId(DB.uds,id) || {nombre:"—",cod:"—"};
 const docente = id => byId(DB.docentes,id);
@@ -3092,21 +3099,42 @@ function sesForm(s, pre){
   // Validación en vivo: refresca advertencias al cambiar campos
   $("#mform").addEventListener("change", () => { confirmed = false; const b = $("#mform button[type=submit]"); if(b) b.textContent = s ? "Guardar cambios" : "Agregar al horario"; $("#sesWarn").innerHTML = "" });
 }
+function scheduleTurns(ss, turno) {
+  return turno ? [turno] : ["Mañana", "Tarde"].filter(t => ss.some(s => s.turno === t));
+}
+function scheduleRows(ss, turno, byDoc, days) {
+  const lessons = ss.filter(s => s.turno === turno);
+  return SLOTS[turno].map(x => {
+    if(x[0] === "REC") return [`${x[1]}-${x[2]}`, ...days.map(() => "Receso")];
+    return [`${x[0]}-${x[1]}`, ...days.map(d => {
+      const s = lessons.find(z => z.dia === d && mins(z.ini) < mins(x[1]) && mins(x[0]) < mins(z.fin));
+      if(!s) return "";
+      const teacher = docente(s.doc), room = amb(s.amb);
+      return `${ud(s.ud).nombre}\n${byDoc ? prog(s.prog).cod + " " + s.ciclo + "-" + s.sec : (teacher ? shortName(teacher.nom) : "Sin docente")}\n${room ? room.cod : ""}`;
+    })];
+  });
+}
+function shiftGrids(ss, options) {
+  const turns = scheduleTurns(ss);
+  return turns.length ? turns.map(t => `<h3>Turno ${t}</h3>${grid(ss.filter(s=>s.turno===t),t,options)}`).join("") : empty("No hay clases asignadas en este periodo.");
+}
 function horarioPDF(title, ss, turno, byDoc){
   if(!libsOk("pdf")) return;
-  const doc = pdfNew("landscape"); const y = pdfHeader(doc, title, `Periodo académico ${DB.cfg.periodo} · Turno ${turno}`);
-  const days = DIAS.slice(0,5);
-  const rows = SLOTS[turno].map(x => { if(x[0] === "REC") return [`${x[1]}-${x[2]}`, ...days.map(() => "Receso")];
-    return [`${x[0]}-${x[1]}`, ...days.map(d => { const s = ss.find(z => z.dia === d && mins(z.ini) < mins(x[1]) && mins(x[0]) < mins(z.fin)); if(!s) return ""; const dd = docente(s.doc), a = amb(s.amb); return `${ud(s.ud).nombre}\n${byDoc ? prog(s.prog).cod + " " + s.ciclo + "-" + s.sec : (dd ? shortName(dd.nom) : "Sin docente")}\n${a ? a.cod : ""}` })] });
-  pdfTable(doc, y, ["Hora", ...days.map(d => DIAS_L[d])], rows, {styles:{fontSize:7.5, cellPadding:2, valign:"middle", minCellHeight:13}, columnStyles:{0:{cellWidth:24, fontStyle:"bold"}}, didParseCell:c => { if(c.section === "body" && c.cell.raw === "Receso") c.cell.styles.fillColor = [236,240,239]; else if(c.section === "body" && c.column.index > 0 && c.cell.raw) c.cell.styles.fillColor = [219,235,232] }});
+  const doc = pdfNew("landscape"), days = DIAS.slice(0, ss.some(s=>s.dia==="Sáb") ? 6 : 5);
+  const turns = scheduleTurns(ss, turno);
+  if(!turns.length){ toast("No hay clases para exportar."); return; }
+  turns.forEach((t,index)=>{
+    if(index) doc.addPage();
+    const y=pdfHeader(doc,title,`Periodo académico ${DB.cfg.periodo} · Turno ${t}`);
+    pdfTable(doc,y,["Hora",...days.map(d=>DIAS_L[d])],scheduleRows(ss,t,byDoc,days),{styles:{fontSize:7.5,cellPadding:2,valign:"middle",minCellHeight:13},columnStyles:{0:{cellWidth:24,fontStyle:"bold"}},didParseCell:c=>{if(c.section==="body"&&c.cell.raw==="Receso")c.cell.styles.fillColor=[236,240,239];else if(c.section==="body"&&c.column.index>0&&c.cell.raw)c.cell.styles.fillColor=[219,235,232]}});
+  });
   pdfFooter(doc); log("Exportar","Horarios",title + " (PDF)"); if(!save())return false;
-  saveFile(`horario_${slug(title)}_${fileStamp()}.pdf`, doc.output("blob"));
+  saveFile(`horario_${slug(title)}_${fileStamp()}.pdf`,doc.output("blob"));
 }
 function horarioXLS(title, ss, turno, byDoc){
-  const days = DIAS.slice(0,5);
-  const rows = SLOTS[turno].map(x => { if(x[0] === "REC") return [`${x[1]}-${x[2]}`, ...days.map(() => "Receso")];
-    return [`${x[0]}-${x[1]}`, ...days.map(d => { const s = ss.find(z => z.dia === d && mins(z.ini) < mins(x[1]) && mins(x[0]) < mins(z.fin)); if(!s) return ""; const dd = docente(s.doc), a = amb(s.amb); return `${ud(s.ud).nombre} | ${byDoc ? prog(s.prog).cod + " " + s.ciclo + "-" + s.sec : (dd ? dd.nom : "Sin docente")} | ${a ? a.cod : ""}` })] });
-  exportXLSX(`horario_${slug(title)}_${fileStamp()}.xlsx`, ["Hora", ...days.map(d => DIAS_L[d])], rows, "Horario");
+  const days=DIAS.slice(0,ss.some(s=>s.dia==="Sáb")?6:5), turns=scheduleTurns(ss,turno);
+  const rows=turns.flatMap(t=>scheduleRows(ss,t,byDoc,days).map(row=>turno?row:[t,...row]));
+  exportXLSX(`horario_${slug(title)}_${fileStamp()}.xlsx`,[...(turno?[]:["Turno"]),"Hora",...days.map(d=>DIAS_L[d])],rows,"Horario");
 }
 V.horarios = () => {
   const r = R(), L = lvl("horarios");
@@ -3146,7 +3174,7 @@ V.horarios = () => {
       const aId = S.ui.hamb || (DB.ambientes[0] || {}).id; const a = amb(aId);
       const ss = a ? DB.sesiones.filter(s => s.amb === a.id && s.per === DB.cfg.periodo) : [];
       body = `<section class="panel"><div class="f"><div class="fld"><label for="hamb">Ambiente</label><select id="hamb" data-chg="hamb">${DB.ambientes.map(x => `<option value="${x.id}" ${x.id === aId ? "selected" : ""}>${x.cod} · ${x.tipo}</option>`).join("")}</select></div></div>
-        ${a ? `<div class="panel-h"><div><h2>${esc(a.cod)} · ${esc(a.tipo)}</h2><span class="note">${esc(a.ubic)} · Capacidad ${a.cap} · ${ss.length} sesiones</span></div></div>${grid(ss.filter(s => s.turno === "Mañana"), "Mañana", {byDoc:true, showErr:true})}` : empty("No hay ambientes registrados.")}</section>`;
+        ${a ? `<div class="panel-h"><div><h2>${esc(a.cod)} · ${esc(a.tipo)}</h2><span class="note">${esc(a.ubic)} · Capacidad ${a.cap} · ${ss.length} sesiones</span></div></div>${shiftGrids(ss, {byDoc:true, showErr:true})}` : empty("No hay ambientes registrados.")}</section>`;
     }
     if(T.cur === "config"){
       const sub = S.tab.hconf || "programas";
@@ -3158,7 +3186,7 @@ V.horarios = () => {
     const d = myDoc(); if(!d) return intro + empty("Cuenta sin docente vinculado.");
     const ss = DB.sesiones.filter(s => s.doc === d.id && s.per === DB.cfg.periodo);
     const T = tabs("horarios", [["mio","Mi horario"],["uds","Mis unidades"]]);
-    if(T.cur === "mio") return intro + T.html + `<section class="panel"><div class="panel-h"><div><h2>Horario docente · ${esc(d.nom)}</h2><span class="note">Periodo ${DB.cfg.periodo}</span></div><div class="btnrow"><button class="btn sec sm" data-act="hdPDF">PDF</button><button class="btn sec sm" data-act="hdXLS">Excel</button></div></div>${grid(ss.filter(s => s.turno === "Mañana"), "Mañana", {byDoc:true})}</section>`;
+    if(T.cur === "mio") return intro + T.html + `<section class="panel"><div class="panel-h"><div><h2>Horario docente · ${esc(d.nom)}</h2><span class="note">Periodo ${DB.cfg.periodo}</span></div><div class="btnrow"><button class="btn sec sm" data-act="hdPDF">PDF</button><button class="btn sec sm" data-act="hdXLS">Excel</button></div></div>${shiftGrids(ss, {byDoc:true})}</section>`;
     return intro + T.html + `<section class="panel"><h2>Unidades asignadas</h2><div class="tw"><table><thead><tr><th>Unidad didáctica</th><th>Programa</th><th>Ciclo-Secc.</th><th>Día y hora</th><th>Ambiente</th><th>Publicación</th></tr></thead><tbody>${ss.map(s => `<tr><td>${esc(ud(s.ud).nombre)}</td><td>${prog(s.prog).cod}</td><td>${s.ciclo}-${s.sec}</td><td>${DIAS_L[s.dia]} ${mono(s.ini + "–" + s.fin)}</td><td>${esc((amb(s.amb)||{cod:"—"}).cod)}</td><td>${DB.publicados[gkey(s.prog,s.ciclo,s.sec,s.turno)] ? pill("Publicado","p-ok") : pill("Borrador","p-warn")}</td></tr>`).join("") || `<tr><td colspan="6">${empty("No tiene unidades asignadas en este periodo.")}</td></tr>`}</tbody></table></div></section>`;
   }
   const e = myEst(); if(!e) return intro + empty("Cuenta sin estudiante vinculado.");
@@ -3928,8 +3956,8 @@ const ACTIONS = {
   unpublish(){ const g = grupoSel(); delete DB.publicados[gkey(g.p,g.c,g.s,g.t)]; log("Retirar publicación","Horarios",`${prog(g.p).cod} ${g.c}-${g.s} ${g.t}`); if(!save())return false; toast("Publicación retirada. El horario volvió a borrador."); render() },
   hPDF(){ const g = grupoSel(); horarioPDF(`${prog(g.p).cod} ciclo ${g.c} sección ${g.s}`, sesGrupo(g), g.t) },
   hXLS(){ const g = grupoSel(); horarioXLS(`${prog(g.p).cod} ciclo ${g.c} sección ${g.s}`, sesGrupo(g), g.t) },
-  hdPDF(){ const d = myDoc() || docente(S.ui.hdoc || DB.docentes[0].id); horarioPDF(`Docente ${d.nom}`, DB.sesiones.filter(s => s.doc === d.id && s.per === DB.cfg.periodo && s.turno === "Mañana"), "Mañana", true) },
-  hdXLS(){ const d = myDoc() || docente(S.ui.hdoc || DB.docentes[0].id); horarioXLS(`Docente ${d.nom}`, DB.sesiones.filter(s => s.doc === d.id && s.per === DB.cfg.periodo && s.turno === "Mañana"), "Mañana", true) },
+  hdPDF(){ const d = myDoc() || docente(S.ui.hdoc || DB.docentes[0].id); horarioPDF(`Docente ${d.nom}`, DB.sesiones.filter(s => s.doc === d.id && s.per === DB.cfg.periodo), null, true) },
+  hdXLS(){ const d = myDoc() || docente(S.ui.hdoc || DB.docentes[0].id); horarioXLS(`Docente ${d.nom}`, DB.sesiones.filter(s => s.doc === d.id && s.per === DB.cfg.periodo), null, true) },
   hePDF(){ const e = myEst(); horarioPDF(`${prog(e.prog).cod} ciclo ${e.ciclo} sección ${e.sec}`, DB.sesiones.filter(s => s.per === DB.cfg.periodo && s.prog === e.prog && s.ciclo === e.ciclo && s.sec === e.sec && s.turno === e.turno), e.turno) },
   heXLS(){ const e = myEst(); horarioXLS(`${prog(e.prog).cod} ciclo ${e.ciclo} sección ${e.sec}`, DB.sesiones.filter(s => s.per === DB.cfg.periodo && s.prog === e.prog && s.ciclo === e.ciclo && s.sec === e.sec && s.turno === e.turno), e.turno) },
   valXLS(){ exportXLSX(`validacion_horarios_${fileStamp()}.xlsx`, ["Severidad","Tipo","Detalle"], validar().map(v => [v.t === "bad" ? "Error" : "Advertencia", v.tipo, v.msg]), "Validaciones") },
@@ -4169,7 +4197,7 @@ return {
   persist(){ return save() },
   notifyTo(to, txt, go){ notify(to, txt, go) },
   logAct(a, m, d){ log(a, m, d) },
-  nextIdOf(col){ return Math.max(0, ...DB[col].map(x => +x.id || 0)) + 1 },
+  nextIdOf(col){ return nextId(DB[col]) },
   vinOpts(){ return vinOpts() },
   findEst(k){ k = String(k || "").trim(); const e = k && DB.estudiantes.find(x => x.dni === k); return e ? {id:e.id, dni:e.dni, nom:e.nom, estado:e.estado} : null },
   estById(id){ const e = byId(DB.estudiantes, +id); return e ? {id:e.id, dni:e.dni, nom:e.nom, estado:e.estado} : null },
@@ -5708,7 +5736,8 @@ function bindFields(fields, work, root, rerender) {
   $$('[data-ff]', root).forEach(inp => inp.onchange = () => editorFileTask(inp, async () => {
     const f = inp.files[0]; if (!f) return; const n = inp.dataset.ff; const er = checkFile(f, 'pdf'); if (er) { inp.value = ''; return toast(er, 'err'); }
 
-    if (work[n] && !await confirmBox(`Ya existe un documento vigente (${esc(work[n].original || work[n].nombre)}). ¿Reemplazarlo? La versión anterior quedará en el historial.`, { ok: 'Reemplazar', danger: false })) { inp.value = ''; return; }
+    const history = SPECS[ADM.workKey]?.versioned?.includes(n);
+    if (work[n] && !await confirmBox(`Ya existe un documento vigente (${esc(work[n].original || work[n].nombre)}). ¿Reemplazarlo?${history ? ' La versión anterior quedará en el historial.' : ''}`, { ok: 'Reemplazar', danger: false })) { inp.value = ''; return; }
     const file = await portalUpload(f); if (ADM.work !== work) return;
     work[n] = {...file,fecha:nowISO(),por:currentUser().usuario}; rerender();
   }));
@@ -5752,7 +5781,7 @@ function crudList(spec) {
   const st = ADM.state[spec.key] = ADM.state[spec.key] || { q: '', f: {}, page: 1, size: 10, trash: false };
   let rows = coll(spec.coll).filter(r => st.trash ? r.deleted : !r.deleted);
   if (spec.scope) rows = rows.filter(spec.scope);
-  if (st.q) { const t = normTitle(st.q); rows = rows.filter(r => normTitle((spec.search || ['titulo', 'nombre']).map(k => typeof k === 'function' ? k(r) : r[k]).join(' ')).includes(t)); }
+  if (st.q) { const t = normTitle(st.q); rows = rows.filter(r => normTitle([spec.label(r), ...(spec.search || ['titulo', 'nombre']).map(k => typeof k === 'function' ? k(r) : r[k])].join(' ')).includes(t)); }
   (spec.filters || []).forEach(fl => { const v = st.f[fl.n]; if (v) rows = rows.filter(r => fl.test ? fl.test(r, v) : String(r[fl.n]) === v); });
   rows.sort(spec.sort || ((a, b) => (a.orden ?? 0) - (b.orden ?? 0) || String(b.modEn || '').localeCompare(String(a.modEn || ''))));
   const tot = rows.length; st.page = Math.max(1, Math.min(st.page, Math.ceil(tot / st.size) || 1)); const pg = rows.slice((st.page - 1) * st.size, st.page * st.size);
@@ -7661,7 +7690,15 @@ function bolsaEmpresas() {
 const PADRON_COLS = ['DNI', 'Apellidos y Nombres', 'Condición', 'Fecha de Nacimiento', 'Correo', 'Domicilio', 'Celular', 'Programa de Estudio', 'Año de Egreso', 'Dónde labora', 'Área'];
 const nrm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
 function headKey(h) { const t = nrm(h); if (/^dni|documento/.test(t)) return 'dni'; if (/apellido|nombre/.test(t)) return 'nom'; if (/condicion|situacion|estado/.test(t)) return 'cond'; if (/nacimiento/.test(t)) return 'fnac'; if (/correo|email|e mail/.test(t)) return 'correo'; if (/domicilio|direccion/.test(t)) return 'dom'; if (/celular|telefono|movil/.test(t)) return 'tel'; if (/programa|carrera|especialidad/.test(t)) return 'prog'; if (/egreso|promocion/.test(t)) return 'anio'; if (/labora|trabaja|empresa|centro/.test(t)) return 'labora'; if (/^area|cargo|puesto/.test(t)) return 'areaLab'; return null; }
-function progFromText(t) { t = nrm(t); if (!t) return ''; if (/comput|informat|apsti|plataforma|tecnologias de (la )?informacion|sistemas/.test(t)) return 'apsti'; if (/contab/.test(t)) return 'cont'; if (/enferm/.test(t)) return 'enf'; if (/agropecu|agrari|agronom/.test(t)) return 'pa'; if (/hostel|restaur|ashr|turism|gastron|hotel/.test(t)) return 'ashr'; return ''; }
+function progFromText(t) {
+  const text=nrm(t); if(!text)return '';
+  const catalog=coll('programas');
+  const direct=catalog.find(p=>[p.id,p.codigo,p.nombre].some(v=>nrm(v)===text));
+  if(direct)return direct.id;
+  const aliases=[[/comput|informat|apsti|plataforma|tecnologias de (la )?informacion|sistemas/,['apsti']],[/contab/,['cont']],[/enferm/,['enf']],[/agropecu|agrari|agronom/,['pa']],[/turism|guia oficial/,['got','ashr']],[/electricidad/,['ei']],[/electronica/,['eli']],[/mecatronica|automotriz/,['ma']],[/hostel|restaur|ashr|gastron|hotel/,['ashr']]];
+  for(const[pattern,ids]of aliases)if(pattern.test(text)){const match=catalog.find(p=>ids.includes(nrm(p.id))||ids.includes(nrm(p.codigo)));return match?.id||'';}
+  return '';
+}
 function condFromText(t) { t = nrm(t); if (/titulad/.test(t)) return 'Titulado'; if (/egresad/.test(t)) return 'Egresado'; if (/por concluir|estudiante|regular|cursando|matriculad/.test(t)) return 'Regular'; return ''; }
 function excelDate(v) { if (v instanceof Date && !isNaN(v)) return ymd(v); if (typeof v === 'number' && v > 59 && v < 80000) { const d = new Date(Math.round((v - 25569) * 86400000)); return d.toISOString().slice(0, 10); } const s = String(v || '').trim(); let m = s.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/); if (m) return `${m[3]}-${pad(m[2])}-${pad(m[1])}`; m = s.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return m[0]; return ''; }
 function parsePadron(rows) {
@@ -7686,7 +7723,7 @@ function parsePadron(rows) {
 }
 async function readSheet(file) {
   const ext = (file.name.split('.').pop() || '').toLowerCase();
-  if (window.XLSX) { const buf = await file.arrayBuffer(); const wb = XLSX.read(buf, { type: 'array', cellDates: true }); const ws = wb.Sheets[wb.SheetNames[0]]; return XLSX.utils.sheet_to_json(ws, { defval: '', raw: true }); }
+  if (window.XLSX) { const isCSV = ext === 'csv'; const content = isCSV ? (await file.text()).replace(/^\uFEFF/, '') : await file.arrayBuffer(); const wb = XLSX.read(content, { type: isCSV ? 'string' : 'array', cellDates: true, ...(isCSV ? { raw: true } : {}) }); const ws = wb.Sheets[wb.SheetNames[0]]; return XLSX.utils.sheet_to_json(ws, { defval: '', raw: true }); }
   if (ext !== 'csv') throw new Error('Para leer archivos Excel se requiere conexión a internet (librería XLSX). Puede usar la plantilla en CSV.');
   const txt = (await readAsText(file)).replace(/^﻿/, ''); const lines = txt.split(/\r?\n/).filter(l => l.trim()); const sep = (lines[0].match(/;/g) || []).length >= (lines[0].match(/,/g) || []).length ? ';' : ',';
   const cells = l => { const out = []; let cur = '', q = false; for (const ch of l) { if (ch === '"') q = !q; else if (ch === sep && !q) { out.push(cur); cur = ''; } else cur += ch; } out.push(cur); return out.map(s => s.trim()); };
@@ -7694,7 +7731,7 @@ async function readSheet(file) {
 }
 function padronTemplate() {
   const rows = [PADRON_COLS, ['70000001', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Egresado', '15/03/2000', 'mesapartes2020@istpnasca.edu.pe', 'Av. Ejemplo 123, Ica', '900000001', 'Arquitectura de Plataformas y Servicios de Tecnologías de Información', '2024', 'Empresa de ejemplo S.A.C.', 'Soporte técnico'], ['70000002', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Por Concluir', '02/08/2004', '', '', '900000002', 'Contabilidad', '', '', '']];
-  if (window.XLSX) { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(rows); ws['!cols'] = PADRON_COLS.map((c, i) => ({ wch: [10, 38, 14, 14, 26, 30, 12, 50, 12, 28, 18][i] })); XLSX.utils.book_append_sheet(wb, ws, 'Padron'); const ins = XLSX.utils.aoa_to_sheet([['Instrucciones de llenado'], ['DNI: 8 dígitos (obligatorio).'], ['Apellidos y Nombres: obligatorio.'], ['Condición: Egresado, Titulado o Por Concluir (estudiante).'], ['Programa de Estudio: ASHR, APSTI (o Computación e Informática), Contabilidad, Enfermería Técnica, Producción Agropecuaria.'], ['Fecha de nacimiento: DD/MM/AAAA. Celular: 9 dígitos.'], ['Si el DNI ya existe se actualizan sus datos; si no, se registra.']]); XLSX.utils.book_append_sheet(wb, ins, 'Instrucciones'); downloadBlob(new Blob([XLSX.write(wb, { type: 'array', bookType: 'xlsx' })], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'plantilla_padron_estudiantes_egresados.xlsx'); }
+  if (window.XLSX) { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(rows); ws['!cols'] = PADRON_COLS.map((c, i) => ({ wch: [10, 38, 14, 14, 26, 30, 12, 50, 12, 28, 18][i] })); XLSX.utils.book_append_sheet(wb, ws, 'Padron'); const ins = XLSX.utils.aoa_to_sheet([['Instrucciones de llenado'], ['DNI: 8 dígitos (obligatorio).'], ['Apellidos y Nombres: obligatorio.'], ['Condición: Egresado, Titulado o Por Concluir (estudiante).'], ['Programa de Estudio: use el nombre o código de un programa institucional registrado. Computación e Informática se reconoce como APSTI.'], ['Fecha de nacimiento: DD/MM/AAAA. Celular: 9 dígitos.'], ['Si el DNI ya existe se actualizan sus datos; si no, se registra.']]); XLSX.utils.book_append_sheet(wb, ins, 'Instrucciones'); downloadBlob(new Blob([XLSX.write(wb, { type: 'array', bookType: 'xlsx' })], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'plantilla_padron_estudiantes_egresados.xlsx'); }
   else downloadText(toCSV(rows), 'plantilla_padron_estudiantes_egresados.csv', 'text/csv');
 }
 let PADRON_PREV = null;
@@ -8225,7 +8262,7 @@ function svPostular(id) {
 R('servicios/bolsa-laboral', (path, q) => {
   const ofs = svOfertas(); const D = IX && IX.db ? XD() : { empresas: [], programas: [] }; const cfg = window.pzBolsaCfg();
   const emps = D.empresas.filter(e => e.validada); const vac = ofs.reduce((a, o) => a + (+o.vac || 0), 0);
-  const tab0 = q && q.get && q.get('tab') === 'empresas' ? 'e' : q && q.get && q.get('tab') === 'como' ? 'i' : 'o';
+  const tab0 = q && q.get && (q.get('tab') === 'empresas' || q.get('registro') === '1') ? 'e' : q && q.get && q.get('tab') === 'como' ? 'i' : 'o';
   const progs = [...new Set(ofs.map(o => o.prog).filter(Boolean))].map(id => xprog(id));
   const body = `${svNav('bolsa-laboral')}${svHead('bolsa', [['briefcase', `<b>${ofs.length}</b> ofertas vigentes`], ['users', `<b>${vac}</b> vacantes`], ['building', `<b>${emps.length}</b> empresas aliadas`]])}
    ${svTabs([['o', 'briefcase', 'Ofertas laborales'], ['e', 'building', 'Para empresas'], ['i', 'book', '¿Cómo postular?']], tab0)}
