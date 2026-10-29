@@ -5,7 +5,7 @@ trait PortalForms
     public function challenge(array $input): array
     {
         $purpose=$input['purpose']??'';
-        if(!in_array($purpose,['mensajes','expedientes','reclamos','certificados','suscriptores'],true))throw new PortalError(422,'Formulario no válido.');
+        if(!in_array($purpose,['expedientes','reclamos','certificados'],true))throw new PortalError(422,'Formulario no válido.');
         $this->rate('challenge',120,60);
         $_SESSION['challenges']=array_filter($_SESSION['challenges']??[],fn($c)=>$c['expires']>=time());
         if(count($_SESSION['challenges'])>=80)array_shift($_SESSION['challenges']);

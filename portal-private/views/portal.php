@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?= htmlspecialchars($bootstrap['data']['config']['seo']['titulo'] ?? $bootstrap['data']['config']['inst']['nombre'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></title>
-<meta name="description" content="<?= htmlspecialchars($bootstrap['data']['config']['seo']['descripcion'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+<title>Intranet Palpa | Gestión académica y administrativa</title>
+<meta name="description" content="Intranet del IES Público Palpa: gestión académica, trámites, empleabilidad y perfiles docentes.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#131d3b">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230a2a5e'/%3E%3Cpath d='M14 30 32 20l18 10-18 10z' fill='%23f2b705'/%3E%3Cpath d='M22 35v8c6 5 14 5 20 0v-8' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@0,600;0,700;0,800;1,600&family=Poppins:wght@500;600;700;800&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap-grid.min.css">
 <style id="ix-css">
 .ix{--bg:#f3f6f5; --surface:#ffffff; --surface-2:#eef3f2; --line:#dbe4e1; --line-2:#c8d5d1; --fg:#12201d; --muted:#586a65;
   --brand:#0f5e57; --brand-2:#13786f; --brand-ink:#ffffff; --brand-soft:#dcefeb; --accent:#c08424; --accent-soft:#f8ecd6;
@@ -2184,9 +2185,10 @@ tr.pz-bad td{background:var(--errbg)}
 .ix .seal.logo:has(img[src^="/assets/palpa/"]),.ix .paper .ph .plogo[src^="/assets/palpa/"]{background:#131d3b}
 @media(max-width:600px){.grid.g4:has(>.pcard){grid-template-columns:1fr}.brand img[src^="/assets/palpa/"]{width:86px;height:50px;padding:6px}.site-header .brand span small{font-size:10px}}
 </style>
+<link rel="stylesheet" href="/intranet.css">
 </head>
 <body>
-<noscript><p style="padding:20px">Este portal requiere JavaScript habilitado.</p></noscript>
+<noscript><p style="padding:20px">La intranet requiere JavaScript habilitado.</p></noscript>
 <div id="app" aria-live="off"></div>
 <script>window.PORTAL_BOOTSTRAP = <?= json_encode(PortalContent::forJson($bootstrap), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR) ?>;</script>
 <div class="ix ix-layer" id="ix-layer" data-palette="web"><div id="ixmodal"></div></div>
@@ -4652,7 +4654,7 @@ const SESSION_IDLE_MIN=30;let portalActivityAt=Date.now();
 function touchSession(){portalActivityAt=Date.now();}
 function sessionExpired(){return Date.now()-portalActivityAt>SESSION_IDLE_MIN*60000;}
 const role = () => ROLES[(currentUser() || {}).rol] || {};
-const can = mod => { const r = role(); return !!(r.mods && r.mods.includes(mod)); };
+const can = mod => { const r = role(); return window.PORTAL_BOOTSTRAP.scope.modules.includes(mod) && !!(r.mods && r.mods.includes(mod)); };
 const canFlag = f => !!role()[f];
 function audit(accion, entidad, registro = '', detalle = '') {
   const u = currentUser();
@@ -5008,7 +5010,7 @@ R('nosotros/plana-jerarquica', path => {
    ${d ? `<section class="director" aria-label="Dirección General"><img src="${img(d.p.foto)}" alt="Fotografía de ${esc(fullName(d.p))}"><div class="msg"><h2 style="color:#fff;font-size:18px">Mensaje de la Dirección General</h2><blockquote>“${esc(pg0.mensaje)}”</blockquote><strong>${esc(fullName(d.p))}</strong><span>${esc(d.j.cargo)}</span><p style="margin-top:8px"><a href="mailto:${esc(d.p.correo)}" style="color:#cfe0ff">${esc(d.p.correo)}</a></p></div></section>` : ''}
    ${others.length ? `<div class="collage">${others.map(({ j, p }) => `<figure><img src="${img(p.foto)}" alt="Fotografía de ${esc(fullName(p))}" loading="lazy"><figcaption><strong>${esc(fullName(p))}</strong><small>${esc(j.cargo)}</small><small><a href="mailto:${esc(p.correo)}">${esc(p.correo)}</a></small></figcaption></figure>`).join('')}</div>` : emptyMsg('integrantes')}
    ${coords.length ? `<h2>Coordinadores de programas de estudio</h2><div class="collage">${coords.map(({ pp, p }) => `<figure><img src="${img(p.foto)}" alt="Fotografía de ${esc(fullName(p))}" loading="lazy"><figcaption><strong>${esc(fullName(p))}</strong><small>Coordinador(a) de ${esc(pp.nombre)}</small></figcaption></figure>`).join('')}</div>` : ''}`;
-  return shell(path, { title: 'Plana Jerárquica', desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Plana Jerárquica']], banner: { title: 'Nosotros', text: 'Conoce nuestra identidad, historia y el compromiso con la formación técnica.' }, side: nosotrosSide('plana-jerarquica') + sidePromo('Trabajo en equipo para una mejor educación técnica'), body });
+  return shell(path, { title: 'Plana Jerárquica', desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Plana Jerárquica']], banner: { title: 'Directorio profesional', text: 'Perfiles de la comunidad académica de Palpa.' }, side: nosotrosSide('plana-jerarquica') + sidePromo('Trabajo en equipo para una mejor educación técnica'), body });
 });
 const CATS = () => progs().map(p => ({ id: p.id, label: p.nombre, icon: p.icono })).concat([{ id: 'emp', label: 'Empleabilidad', icon: 'briefcase' }]);
 const docentesDe = cat => sortO(P('personas').filter(p => p.tipo === 'Docente' && isPub(p) && (cat === 'emp' ? p.empleabilidad : (p.programas || []).includes(cat))));
@@ -5020,7 +5022,7 @@ R('nosotros/plana-docente', (path, q) => {
    <div class="cat-tabs" role="group" aria-label="Categorías de docentes">${cats.map(c => `<button data-cat="${c.id}" aria-pressed="${c.id === sel.id}">${ic(c.icon)}<span>${esc(c.label)}</span></button>`).join('')}</div>
    <h2 style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">${esc(sel.label)} <span class="badge">${ds.length} docente(s)</span></h2>
    ${ds.length ? `<div class="grid g4">${ds.map(d => `<article class="card tcard"><img src="${img(d.foto)}" alt="Fotografía de ${esc(fullName(d))}" loading="lazy"><div class="cb"><strong>${esc(fullName(d))}</strong><small>${esc(d.especialidad)}</small><span class="badge ${d.condicion === 'Nombrado' ? 'ok' : 'gray'}" style="align-self:center">Docente ${esc(d.condicion.toLowerCase())}</span><button class="btn sm sec" data-prof="${d.id}">Ver perfil</button></div></article>`).join('')}</div>` : emptyMsg('docentes en esta categoría')}`;
-  const html = shell(path, { title: 'Plana Docente' + (sel ? ' - ' + sel.label : ''), desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Plana Docente']], banner: { title: 'Nosotros', text: 'Conoce nuestra identidad, historia y el compromiso con la formación técnica.' }, side: nosotrosSide('plana-docente') + sidePromo('Docentes que inspiran el talento del futuro', 'La educación no cambia el mundo, cambia a las personas que van a cambiar el mundo. — Paulo Freire'), body });
+  const html = shell(path, { title: 'Plana Docente' + (sel ? ' - ' + sel.label : ''), desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Plana Docente']], banner: { title: 'Directorio profesional', text: 'Perfiles de la comunidad académica de Palpa.' }, side: nosotrosSide('plana-docente') + sidePromo('Docentes que inspiran el talento del futuro', 'La educación no cambia el mundo, cambia a las personas que van a cambiar el mundo. — Paulo Freire'), body });
   return { html, after: () => { $$('[data-cat]').forEach(b => b.onclick = () => go('#/nosotros/plana-docente?p=' + b.dataset.cat)); $$('[data-prof]').forEach(b => b.onclick = () => teacherModal(b.dataset.prof, sel.id)); } };
 });
 function teacherModal(id, progId) {
@@ -5043,7 +5045,7 @@ R('nosotros/campus-e-informes', (path, q) => {
    <iframe class="map" title="Mapa de ubicación de ${esc(i.nombreCorto)}" loading="lazy" src="https://maps.google.com/maps?q=${locationQuery}&output=embed"></iframe></section>
    ${locs.length > 1 ? `<h2>Locales</h2><div class="grid g2">${locs.map(l => `<article class="card"><img src="${img(l.foto)}" alt="" style="aspect-ratio:16/9;object-fit:cover;border-radius:10px 10px 0 0"><div class="cb"><h3>${esc(l.nombre)}</h3><p>${esc(l.direccion)}<br>${esc(l.telefono)} · ${esc(l.correo)}<br>${esc(l.horario)}</p></div></article>`).join('')}</div>` : ''}
    <section style="margin-top:22px"><h2>${ic('mail').replace('<svg', '<svg style="width:22px;height:22px;stroke:var(--link);fill:none;stroke-width:2;vertical-align:-4px"')} Contáctanos</h2><p>Completa el formulario y te responderemos a la brevedad.</p>${contactForm(q.get('programa'))}</section>`;
-  const html = shell(path, { title: 'Campus e Informes', desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Campus e Informes']], banner: { title: 'Nosotros', text: 'Conoce nuestra identidad, historia y el compromiso con la formación técnica.' }, side: nosotrosSide('campus-e-informes') + `<figure class="side-box" style="margin:0 0 18px"><img src="${img(pg0.imagen || L.foto)}" alt="Campus institucional" style="aspect-ratio:4/3;object-fit:cover"><figcaption class="pad"><strong>Un campus para grandes oportunidades</strong></figcaption></figure><section class="side-box"><h2>Horarios de atención</h2><div class="pad"><p style="margin:0 0 6px"><b>${esc(i.horario)}</b></p><p style="margin:0">${esc(i.horarioSab || '')}</p></div></section>`, body });
+  const html = shell(path, { title: 'Campus e Informes', desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Campus e Informes']], banner: { title: 'Directorio profesional', text: 'Perfiles de la comunidad académica de Palpa.' }, side: nosotrosSide('campus-e-informes') + `<figure class="side-box" style="margin:0 0 18px"><img src="${img(pg0.imagen || L.foto)}" alt="Campus institucional" style="aspect-ratio:4/3;object-fit:cover"><figcaption class="pad"><strong>Un campus para grandes oportunidades</strong></figcaption></figure><section class="side-box"><h2>Horarios de atención</h2><div class="pad"><p style="margin:0 0 6px"><b>${esc(i.horario)}</b></p><p style="margin:0">${esc(i.horarioSab || '')}</p></div></section>`, body });
   return { html, after: bindContactForm };
 });
 function contactForm(pre = '') {
@@ -8034,7 +8036,7 @@ async function cvPdf(p) {
 const autorizado = p => !!(p && p.cv && p.cv.autoriza && p.cv.autoriza.ok);
 const directorioVisible = publicTeacherVisible;
 function openPublicTeacher(id) { const p = byId('personas', id); if (!p) return; if (autorizado(p)) return cvDownload(p, 'public'); if (directorioVisible(p)) teacherModal(id, (p.programas || [])[0]); }
-const pzPlanaTabs = a => `<nav class="pz-ptabs" aria-label="Plana institucional"><a href="#/nosotros/plana-jerarquica" ${a === 'j' ? 'aria-current="page"' : ''}>Personal directivo jerárquico</a><a href="#/nosotros/plana-docente" ${a === 'd' ? 'aria-current="page"' : ''}>Docentes</a></nav>`;
+const pzPlanaTabs = () => '';
 const tcard = (p, cargo, btn2) => `<article class="pz-tcard"><div class="ph"><img src="${img(p.foto)}" alt="Fotografía de ${esc(fullName(p))}" loading="lazy"></div><div class="tb"><h3>${esc(fullName(p))}</h3><small>${esc(cargo)}</small>${p.correo ? `<a class="ml" href="mailto:${esc(p.correo)}">${S16('mail')} <span>${esc(p.correo).replace('@', '<wbr>@')}</span></a>` : ''}<div class="bt"><button class="b1" data-hv="${p.id}">${autorizado(p) ? 'Hoja de vida' : 'Ficha pública'}</button>${btn2}</div></div></article>`;
 R('nosotros/plana-docente', (path, q) => {
   const pg0 = page('docentes'); if (!pg0 || !isPub(pg0)) return notFound(path);
@@ -8047,7 +8049,7 @@ R('nosotros/plana-docente', (path, q) => {
    <h2 style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">${esc(sel.label)} <span class="badge">${ds.length} docente(s) · ${total} en total</span></h2>
    ${ds.length ? `<div class="pz-tgrid">${ds.map(d => tcard(d, d.especialidad + (d.condicion ? ' · ' + d.condicion : ''), `<button class="b2" data-ud="${d.id}">Unidades didácticas</button>`)).join('')}</div>` : emptyMsg('docentes en esta categoría')}
    <p class="pz-legal">${S16('shield')} Las fichas procedentes del portal institucional de origen muestran únicamente información profesional ya publicada. Los CV completos requieren autorización de difusión, conforme a la Ley N.º 29733. Información actualizada al ${fdate(nowISO())} por el responsable del Portal Web.</p>`;
-  const html = shell(path, { title: 'Plana Docente ' + yearNow() + (sel ? ' - ' + sel.label : ''), desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Plana Docente']], banner: { title: 'Nosotros', text: 'Conoce nuestra identidad, historia y el compromiso con la formación técnica.' }, side: nosotrosSide('plana-docente') + sidePromo('Docentes que inspiran el talento del futuro', 'La educación no cambia el mundo, cambia a las personas que van a cambiar el mundo. — Paulo Freire'), body });
+  const html = shell(path, { title: 'Plana Docente ' + yearNow() + (sel ? ' - ' + sel.label : ''), desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Plana Docente']], banner: { title: 'Directorio profesional', text: 'Perfiles de la comunidad académica de Palpa.' }, side: nosotrosSide('plana-docente') + sidePromo('Docentes que inspiran el talento del futuro', 'La educación no cambia el mundo, cambia a las personas que van a cambiar el mundo. — Paulo Freire'), body });
   return { html, after: () => {
     $$('[data-cat]').forEach(b => b.onclick = () => go('#/nosotros/plana-docente?p=' + b.dataset.cat));
     $('[data-ps]').onsubmit = e => { e.preventDefault(); go('#/nosotros/plana-docente?p=' + sel.id + '&q=' + encodeURIComponent(e.target.q.value.trim())); };
@@ -8064,7 +8066,7 @@ R('nosotros/plana-jerarquica', path => {
    <div class="pz-tgrid three">${ord.map(({ j, p }) => tcard(p, j.cargo, `<button class="b2" data-cg="${j.id}">Cargo académico</button>`)).join('')}</div>
    ${d ? `<section class="director" aria-label="Mensaje de la Dirección General" style="margin-top:26px"><img src="${img(d.p.foto)}" alt="Fotografía de ${esc(fullName(d.p))}"><div class="msg"><h2 style="color:#fff;font-size:18px">Mensaje de la Dirección General</h2><blockquote>“${esc(pg0.mensaje)}”</blockquote><strong>${esc(fullName(d.p))}</strong><span>${esc(d.j.cargo)}</span></div></section>` : ''}
    ${coords.length ? `<h2>Coordinadores de programas de estudio</h2><div class="pz-tgrid">${coords.map(({ pp, p }) => tcard(p, 'Coordinador(a) de ' + pp.nombre, `<button class="b2" data-ud="${p.id}" data-prog="${pp.id}">Unidades didácticas</button>`)).join('')}</div>` : ''}`;
-  const html = shell(path, { title: 'Plana Jerárquica', desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Plana Jerárquica']], banner: { title: 'Nosotros', text: 'Conoce nuestra identidad, historia y el compromiso con la formación técnica.' }, side: nosotrosSide('plana-jerarquica') + sidePromo('Trabajo en equipo para una mejor educación técnica'), body });
+  const html = shell(path, { title: 'Plana Jerárquica', desc: stripTags(pg0.contenido), crumbs: [['Nosotros', '#/nosotros/presentacion'], ['Plana Jerárquica']], banner: { title: 'Directorio profesional', text: 'Perfiles de la comunidad académica de Palpa.' }, side: nosotrosSide('plana-jerarquica') + sidePromo('Trabajo en equipo para una mejor educación técnica'), body });
   return { html, after: () => {
     $$('[data-hv]').forEach(b => b.onclick = () => openPublicTeacher(b.dataset.hv));
     $$('[data-ud]').forEach(b => b.onclick = () => teacherModal(b.dataset.ud, b.dataset.prog));
@@ -8129,7 +8131,7 @@ const SV_MODS = {
 const SV_ORDER = ['mpv', 'lr', 'cert', 'bolsa'];
 /* barra de módulos (siempre visible arriba del contenido) */
 function svNav(active) {
-  const it = SV_ORDER.map(k => [SV_MODS[k].slug, SV_MODS[k].short, SV_MODS[k].icon]).concat([['complementarios', 'Complementarios', 'layers']]);
+  const it = SV_ORDER.map(k => [SV_MODS[k].slug, SV_MODS[k].short, SV_MODS[k].icon]);
   return `<nav class="pz-svnav" aria-label="Servicios en línea"><a href="#/servicios" class="pz-svnav-h ${active === '' ? 'on' : ''}" title="Servicios en línea" aria-label="Servicios en línea">${sic('home', 16)}</a>${it.map(([s, l, i]) => `<a href="#/servicios/${s}" class="${s === active ? 'on' : ''}" ${s === active ? 'aria-current="page"' : ''}>${sic(i, 16)}<span>${l}</span></a>`).join('')}</nav>`;
 }
 /* cabecera del módulo */
@@ -8420,5 +8422,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 })();
 </script>
 <script src="/portal-server.js"></script>
+<script src="/intranet.js"></script>
 </body>
 </html>

@@ -11,6 +11,7 @@ final class PortalError extends RuntimeException
 
 require_once __DIR__.'/Schema.php';
 require_once __DIR__.'/Policy.php';
+require_once __DIR__.'/IntranetScope.php';
 require_once __DIR__.'/Accounts.php';
 require_once __DIR__.'/Files.php';
 require_once __DIR__.'/Domain.php';
@@ -136,10 +137,10 @@ final class PortalApp
     {
         $state=$this->state();$full=json_decode($state['data'],true,flags:JSON_THROW_ON_ERROR);$user=$this->user();
         try{$full['visitas']=$this->db()->query('SELECT visit_day,views FROM pisco_visits')->fetchAll(PDO::FETCH_KEY_PAIR);}catch(PDOException $e){if($e->getCode()!=='42S02')throw $e;$full['visitas']=[];}
-        $data=PortalPolicy::project($full,$user,$this->publicData($full));
+        $data=IntranetScope::project(PortalPolicy::project($full,$user,$this->publicData($full)));
         $data['usuarios']=$this->visibleAccounts($user,$full);
         if($user&&$user['rol']==='admin'){$data['auditoria']=[...PortalAudit::rows($this),...PortalAudit::legacy($this,$full)];$data['academico']['bitacora']=array_map(fn($r)=>['id'=>$r['id'],'f'=>$r['fecha'],'u'=>$r['usuario'],'a'=>$r['accion'],'m'=>$r['entidad'],'d'=>$r['registro'].' · '.$r['detalle']],PortalAudit::rows($this));}
-        return ['data'=>$data,'revision'=>(int)$state['revision'],'user'=>$user,'csrf'=>$_SESSION['csrf'],'schema_version'=>PortalSchema::VERSION,'roles'=>PortalPolicy::definitions()['roles']];
+        return ['data'=>$data,'revision'=>(int)$state['revision'],'user'=>$user,'csrf'=>$_SESSION['csrf'],'schema_version'=>PortalSchema::VERSION,'roles'=>PortalPolicy::definitions()['roles'],'scope'=>['mode'=>'intranet','website'=>'https://www.istpalpa.edu.pe/','modules'=>IntranetScope::MODULES]];
     }
     public function input(): array
     {
@@ -271,8 +272,9 @@ final class PortalApp
             $state=$this->state(true);$user=$this->requireUser();if(!isset($input['patch'])&&(int)$state['revision']!==$input['revision'])throw new PortalError(409,'Otra persona guardó cambios. Recarga la página antes de continuar.');
             $previous=json_decode($state['data'],true,flags:JSON_THROW_ON_ERROR);
             foreach($input['data']['usuarios']??[] as $account)if(!is_array($account)||isset($account['passHash'],$account['password'])||isset($account['passHash'])||isset($account['password']))throw new PortalError(422,'Las contraseñas se gestionan mediante el servicio de cuentas.');
-            $visible=PortalPolicy::project($previous,$user,$this->publicData($previous));$visible['usuarios']=$this->visibleAccounts($user,$previous);
+            $visible=IntranetScope::project(PortalPolicy::project($previous,$user,$this->publicData($previous)));$visible['usuarios']=$this->visibleAccounts($user,$previous);
             $incoming=isset($input['patch'])?PortalPatch::apply($visible,$input['patch']):$input['data'];
+            IntranetScope::assertChanges($visible,$incoming);
             $data=PortalPolicy::apply($previous,$visible,$incoming,$user);
             PortalRules::structure($data);
             $ops=$input['accounts']??[];if(!is_array($ops)||count($ops)>100)throw new PortalError(422,'Operaciones de cuentas no válidas.');
@@ -289,7 +291,7 @@ final class PortalApp
             $data['auditoria']=$previous['auditoria']??[];
             $this->updateState($data,(int)$state['revision']+1);
             $data=$this->normalizeDates($data);
-            $projected=PortalPolicy::project($data,$this->user(),$this->publicData($data));
+            $projected=IntranetScope::project(PortalPolicy::project($data,$this->user(),$this->publicData($data)));
             if($this->user()&&$this->user()['rol']==='admin'){$projected['auditoria']=[...PortalAudit::rows($this),...PortalAudit::legacy($this,$data)];$projected['academico']['bitacora']=array_map(fn($r)=>['id'=>$r['id'],'f'=>$r['fecha'],'u'=>$r['usuario'],'a'=>$r['accion'],'m'=>$r['entidad'],'d'=>$r['registro'].' · '.$r['detalle']],PortalAudit::rows($this));}
             return ['revision'=>(int)$state['revision']+1,'user'=>$this->user(),'users'=>$this->visibleAccounts($this->user(),$data),'normalized'=>$projected,'files'=>array_values($aliases)];
         });
@@ -421,6 +423,7 @@ final class PortalApp
     }
     public function submit(string $type, array $input): array
     {
+        if (!in_array($type,['reclamos','expedientes'],true)) throw new PortalError(404,'Formulario fuera del alcance de la intranet.');
         if (!isset(self::RULES[$type])) throw new PortalError(404, 'Tipo de solicitud no disponible.');
         $this->rate('submissions', 10, 60);
         if (!is_string($input['idempotency_key'] ?? null) || !preg_match('/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i', $input['idempotency_key']) || !is_array($input['record'] ?? null)) {
@@ -498,16 +501,12 @@ final class PortalApp
 
     public function lookup(string $type, array $input): array
     {
-        if (!in_array($type, ['expedientes', 'reclamos', 'certificados', 'becarios'], true)) throw new PortalError(404, 'Consulta no disponible.');
+        if (!in_array($type, ['expedientes', 'reclamos', 'certificados'], true)) throw new PortalError(404, 'Consulta no disponible.');
         $this->rate('lookups', 10, 60);
-        $input = self::validate($input, ['reference' => 'required|string|max:150', 'document' => (in_array($type,['certificados','becarios'],true) ? 'nullable' : 'required').'|string|max:50', 'mode' => 'nullable|string|max:10']);
+        $input = self::validate($input, ['reference' => 'required|string|max:150', 'document' => ($type==='certificados' ? 'nullable' : 'required').'|string|max:50', 'mode' => 'nullable|string|max:10']);
         $data = json_decode($this->state()['data'], true, flags: JSON_THROW_ON_ERROR);
         if (!in_array($input['mode'] ?? '', ['', 'codigo', 'dni'], true)) throw new PortalError(422, 'Modo de consulta no válido.');
         if ($type === 'certificados' && ($input['mode'] ?? '') === 'dni' && !preg_match('/^[0-9]{8}$/', $input['reference'])) throw new PortalError(422, 'El DNI debe tener ocho dígitos.');
-        if ($type === 'becarios') {
-            if(!preg_match('/^[0-9]{8}$/',$input['reference']))throw new PortalError(422,'DNI no válido.');
-            $matches=[];foreach($data['becarios']??[] as $r)if(self::publishedScholarship($r,$data)&&($r['dni']??'')===$input['reference']){$r=array_intersect_key($r,array_flip(['id','periodoId','apellidos','nombres','programaId','tipoId','motivo','estado','dni']));$r['dni']='****'.substr($r['dni'],-4);$matches[]=$r;}return ['records'=>$matches];
-        }
         if ($type === 'certificados' && ($input['mode'] ?? '') === 'dni') {
             $matches=[]; foreach ($data['certificados']??[] as $r) if (!($r['deleted']??false) && ($r['dni']??'')===$input['reference']) $matches[]=array_intersect_key($r,array_flip(['id','codigo','nombres','programaId','tipo','detalle','fecha','estado','origen','motivo']));
             return ['records'=>$matches];

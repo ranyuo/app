@@ -28,17 +28,17 @@ try {
 }
 function e(string $value): string { return htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); }
 ?><!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cuentas | Portal Palpa</title><link rel="stylesheet" href="/forms.css"></head>
-<body><main><a href="/#/admin/dashboard">← Volver al panel</a><h1>Cuentas del portal</h1>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cuentas | Intranet Palpa</title><link rel="stylesheet" href="/forms.css"></head>
+<body><main><a href="/#/admin/dashboard">← Volver al panel</a><h1>Cuentas de la intranet</h1>
 <?php if ($notice): ?><p class="notice success" role="status"><?= e($notice) ?></p><?php endif ?>
 <?php if ($error): ?><p class="notice" role="alert"><?= e($error) ?></p><?php endif ?>
-<?php if($actor['rol']==='admin'): ?><section><h2>Usuarios del portal</h2><p>Cada cuenta accede a los módulos de su rol y a los registros con los que está vinculada.</p><ul><?php foreach ($users as $user): ?><li><?= e($user['name']) ?> — <?= e($user['username']) ?> (<?= e($user['role']) ?>)</li><?php endforeach ?></ul></section>
+<?php if($actor['rol']==='admin'): ?><section><h2>Usuarios de la intranet</h2><p>Cada cuenta accede a los módulos de su rol y a los registros con los que está vinculada.</p><ul><?php foreach ($users as $user): ?><li><?= e($user['name']) ?> — <?= e($user['username']) ?> (<?= e($user['role']) ?>)</li><?php endforeach ?></ul></section>
 <section><h2>Crear usuario</h2><form method="post">
 <input type="hidden" name="_csrf" value="<?= e($_SESSION['csrf']) ?>"><input type="hidden" name="action" value="create">
 <label>Nombre<input name="name" required maxlength="150" autocomplete="name"></label>
 <label>Usuario<input name="username" required pattern="[a-z0-9._-]{3,80}" autocomplete="off"></label>
 <label>Correo<input type="email" name="email" required maxlength="254" autocomplete="email"></label>
-<label>Rol<select name="role" style="display:block;width:100%;padding:10px"><?php foreach(PortalPolicy::definitions()['roles'] as $key=>$r):?><option value="<?=e($key)?>"><?=e($r['label'])?></option><?php endforeach ?></select></label>
+<label>Rol<select name="role" style="display:block;width:100%;padding:10px"><?php foreach(PortalPolicy::definitions()['roles'] as $key=>$r):if(in_array($key,['imagen','transparencia'],true))continue;?><option value="<?=e($key)?>"><?=e($r['label'])?></option><?php endforeach ?></select></label>
 <label>Programa del coordinador<input name="programaId" placeholder="Ej.: apsti"></label><label>Vínculo académico<input name="vin" placeholder="doc:2, est:1 o emp:1"></label><label>Persona del docente<input name="personaId" placeholder="ID de la persona en Plana docente"></label><label>DNI / RUC<input name="dni"></label><label>Área<input name="area"></label>
 <label>Contraseña nueva<input type="password" name="password" required minlength="12" maxlength="72" autocomplete="new-password"></label>
 <label>Repetir contraseña<input type="password" name="password_confirmation" required minlength="12" maxlength="72" autocomplete="new-password"></label><button>Crear cuenta</button>

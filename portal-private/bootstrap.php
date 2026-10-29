@@ -55,13 +55,13 @@ function portal_error(Throwable $error, bool $json = false): never
     } else {
         $status = 503;
         $message = 'No se pudo completar la operación. Revisa la configuración de MySQL o consulta al responsable del sitio.';
-        error_log('Portal Palpa: '.get_class($error).' ('.$error->getCode().')');
+        error_log('Intranet Palpa: '.get_class($error).' ('.$error->getCode().')');
     }
     if ($json) {
         portal_json(['message' => $message], $status);
     }
     http_response_code($status);
     header('Content-Type: text/html; charset=utf-8');
-    echo '<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Portal Palpa</title><main style="font:18px/1.6 system-ui;max-width:700px;margin:60px auto;padding:24px"><h1>Portal Palpa</h1><p>'.htmlspecialchars($message, ENT_QUOTES, 'UTF-8').'</p></main></html>';
+    echo '<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Intranet Palpa</title><main style="font:18px/1.6 system-ui;max-width:700px;margin:60px auto;padding:24px"><h1>Intranet Palpa</h1><p>'.htmlspecialchars($message, ENT_QUOTES, 'UTF-8').'</p></main></html>';
     exit;
 }
