@@ -3433,7 +3433,7 @@
       "fecha": "2026-09-17T12:00:00-05:00",
       "resumen": "Cronograma de Proceso de Encargatura de gestión pedagógica 2027",
       "contenido": "<p>Cronograma de Proceso de Encargatura de gestión pedagógica 2027</p>",
-      "imagen": "/assets/nasca/logo-cb57ab132d.png",
+      "imagen": "/assets/nasca/vista-previa-nasca-noticia-1.png",
       "video": "",
       "adjuntos": [
         {
@@ -3452,7 +3452,8 @@
       "creadoPor": "importacion-nasca",
       "creadoEn": "2026-10-29T07:30:00-05:00",
       "modPor": "importacion-nasca",
-      "modEn": "2026-10-29T07:30:00-05:00"
+      "modEn": "2026-10-29T07:30:00-05:00",
+      "imagenAjuste": "contain"
     },
     {
       "id": "nasca-noticia-2",
@@ -3462,7 +3463,7 @@
       "fecha": "2026-08-05T12:00:00-05:00",
       "resumen": "RESULTADO FINAL DEL PROCESO CONTRATO DOCENTE REGULARES IESTP NASCA 2026",
       "contenido": "<p>RESULTADO FINAL DEL PROCESO CONTRATO DOCENTE REGULARES IESTP NASCA 2026</p>",
-      "imagen": "/assets/nasca/logo-cb57ab132d.png",
+      "imagen": "/assets/nasca/vista-previa-nasca-noticia-2.png",
       "video": "",
       "adjuntos": [
         {
@@ -3481,7 +3482,8 @@
       "creadoPor": "importacion-nasca",
       "creadoEn": "2026-10-29T07:30:00-05:00",
       "modPor": "importacion-nasca",
-      "modEn": "2026-10-29T07:30:00-05:00"
+      "modEn": "2026-10-29T07:30:00-05:00",
+      "imagenAjuste": "contain"
     },
     {
       "id": "nasca-noticia-3",

@@ -1,0 +1,20 @@
+{
+  "scope": "local",
+  "previews": [
+    {
+      "src": "/assets/nasca/vista-previa-nasca-noticia-1.png",
+      "loaded": true,
+      "fit": "contain"
+    },
+    {
+      "src": "/assets/nasca/vista-previa-nasca-noticia-2.png",
+      "loaded": true,
+      "fit": "contain"
+    }
+  ],
+  "intranet": {
+    "width": 218,
+    "height": 146,
+    "fit": "contain"
+  }
+}

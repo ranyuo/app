@@ -881,6 +881,28 @@
       "sha256": "ba8750258c82785adf6d251837212fec59a71bd2a5757c30d23afc0d89b248f0",
       "bytes": 17504,
       "type": "image/jpeg"
+    },
+    {
+      "url": "/assets/nasca/vista-previa-nasca-noticia-1.png",
+      "fuente": "https://istpnasca.edu.pe/wp-content/uploads/2026/09/cronograma-de-encargatura-2027-1.pdf",
+      "sha256": "0a59a68c9b9db10d18946047cd253ebad19fd3aad4aaa21b2c11d4f5be471b58",
+      "bytes": 970075,
+      "type": "image/png",
+      "derivadoDe": "/assets/nasca/cronograma-de-encargatura-2027-1-70675071d2.pdf",
+      "sha256Original": "70675071d2f2eeaf931450d7fd309f4a6b13a5796d5f282561282f145f78c3ed",
+      "pagina": 1,
+      "metodo": "Renderización de la primera página del PDF oficial con pdftoppm, sin modificar su contenido."
+    },
+    {
+      "url": "/assets/nasca/vista-previa-nasca-noticia-2.png",
+      "fuente": "https://istpnasca.edu.pe/wp-content/uploads/2026/08/resultados-FE-DE-ERRATA-corregidos-finales-2.pdf",
+      "sha256": "03041328f289b2ec3299f71b28e0612f144d89684ba1d5e6b6701737460e303c",
+      "bytes": 934943,
+      "type": "image/png",
+      "derivadoDe": "/assets/nasca/resultados-FE-DE-ERRATA-corregidos-finales-2-ea23a02876.pdf",
+      "sha256Original": "ea23a02876054b1ecd3134dc16863cc56d835cd8eb52d3bfba2a0cfd915b699f",
+      "pagina": 1,
+      "metodo": "Renderización de la primera página del PDF oficial con pdftoppm, sin modificar su contenido."
     }
   ],
   "erroresFuente": [
@@ -928,6 +950,7 @@
     "Código modular, RUC y correo mesapartes2020 proceden del PEI 2021–2025, p. 14; comprobar actualizaciones institucionales.",
     "Las mallas 2024 se publican completas como PDF. No se transcriben créditos ni unidades mediante OCR sin verificar.",
     "Las fechas de carga del portal no son fechas de aprobación de documentos.",
-    "Se unifican dos duplicidades entre plana docente y jerárquica: Oscar Adrián Ramos Ramos y Aracely Vicky Yañez/Yañes Simon. Se conservan las dos fuentes y variantes de nombre, sin crear dos personas para cada rol."
+    "Se unifican dos duplicidades entre plana docente y jerárquica: Oscar Adrián Ramos Ramos y Aracely Vicky Yañez/Yañes Simon. Se conservan las dos fuentes y variantes de nombre, sin crear dos personas para cada rol.",
+    "Se añaden dos vistas previas de noticias renderizadas desde sus PDF oficiales; reemplazan logotipos repetidos y conservan el contenido documental exacto."
   ]
 }

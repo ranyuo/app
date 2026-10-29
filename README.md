@@ -4,7 +4,7 @@ Sistema PHP/MySQL con contenido del **Instituto de Educación Superior Tecnológ
 
 Incluye ocho programas: Contabilidad, Enfermería Técnica, Guía Oficial de Turismo, Producción Agropecuaria, Arquitectura de Plataformas y Servicios de Tecnologías de la Información, Electricidad Industrial, Electrónica Industrial y Mecatrónica Automotriz. Conserva las funciones del portal: administración, roles, documentos, trámites, reclamos y módulos académicos.
 
-Se incorporaron identidad, historia, misión y valores, directorios, perfiles de egreso, certificación modular, ocho itinerarios formativos en PDF, admisión y resultados 2026, matrícula 2026-I, 40 tasas del TUPA 2025, 37 beneficiarios de becas 2025-I, estadísticas, documentos de gestión, noticias y servicios. Los 106 recursos utilizados se sirven desde `public_html/assets/nasca/`.
+Se incorporaron identidad, historia, misión y valores, directorios, perfiles de egreso, certificación modular, ocho itinerarios formativos en PDF, admisión y resultados 2026, matrícula 2026-I, 40 tasas del TUPA 2025, 37 beneficiarios de becas 2025-I, estadísticas, documentos de gestión, noticias y servicios. Los 106 recursos originales y dos vistas previas derivadas de sus PDF se sirven desde `public_html/assets/nasca/`.
 
 **Los periodos publicados no equivalen a procesos abiertos hoy.** Se documentan las discrepancias de las fuentes sin inventar fechas, autoridades, licencias ni información faltante. Las mallas completas se ofrecen como PDF de 2024; no se atribuye vigencia actual ni se inventan unidades, créditos o horas.
 
