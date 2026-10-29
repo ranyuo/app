@@ -6,7 +6,7 @@
 <title><?= htmlspecialchars($bootstrap['data']['config']['seo']['titulo'] ?? $bootstrap['data']['config']['inst']['nombre'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></title>
 <meta name="description" content="<?= htmlspecialchars($bootstrap['data']['config']['seo']['descripcion'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#0b1d3f">
+<meta name="theme-color" content="#131d3b">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230a2a5e'/%3E%3Cpath d='M14 30 32 20l18 10-18 10z' fill='%23f2b705'/%3E%3Cpath d='M22 35v8c6 5 14 5 20 0v-8' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1584,7 +1584,7 @@ a.db-kpi:hover{transform:translateY(-3px);box-shadow:var(--sh2);border-color:var
 <script src="/assets/vendor/xlsx.full.min.js" defer></script>
 <script src="/assets/vendor/qrcode.min.js" defer></script>
 <style id="pisco-css">
-/* ===== Portal Web IESTP NASCA 2026: módulos del informe N.º 009-2026 ===== */
+/* ===== Portal Web IES PALPA 2026: módulos del informe N.º 009-2026 ===== */
 .pz-h2{font-size:18px;margin:18px 0 10px;color:var(--hc)}
 .pz-h2row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .pz-orange{background:var(--gold)!important;color:var(--navy)!important;border-color:var(--gold)!important}
@@ -2177,6 +2177,12 @@ tr.pz-bad td{background:var(--errbg)}
   table.rt .row-acts,table.rt .btnrow{justify-content:flex-end !important;flex-wrap:wrap}
   .tbl-wrap:has(> table.rt),.tw:has(> table.rt){overflow:visible;border:0 !important;box-shadow:none}
 }
+
+.ix{--brand:#131d3b;--brand-2:#243d65;--brand-soft:#e8edf6;--accent:#bd3d00;--accent-soft:#fff1e7;--side:#131d3b;--side-2:#1c335b}
+/* El logotipo oficial de Palpa es blanco: conservarlo legible sobre azul institucional. */
+.brand img[src^="/assets/palpa/"],.f-brand img[src^="/assets/palpa/"]{width:124px;height:64px;object-fit:contain;background:#131d3b;padding:8px;border-radius:8px;flex-shrink:0}
+.ix .seal.logo:has(img[src^="/assets/palpa/"]),.ix .paper .ph .plogo[src^="/assets/palpa/"]{background:#131d3b}
+@media(max-width:600px){.grid.g4:has(>.pcard){grid-template-columns:1fr}.brand img[src^="/assets/palpa/"]{width:86px;height:50px;padding:6px}.site-header .brand span small{font-size:10px}}
 </style>
 </head>
 <body>
@@ -2189,7 +2195,7 @@ tr.pz-bad td{background:var(--errbg)}
 function IX_FACTORY(HOST){
 "use strict";
 /* =====================================================================
-   INTRANET INSTITUCIONAL IESTP NASCA — PORTAL WEB 2026
+   INTRANET INSTITUCIONAL IES PALPA — PORTAL WEB 2026
    Núcleo: almacenamiento, datos de demostración, utilidades, CRUD,
    documentos (PDF con QR de verificación) y exportaciones (Excel/PDF).
    ===================================================================== */
@@ -2310,7 +2316,7 @@ const PALETAS = [
   ["ica","Verde institucional","Verde institucional y dorado.",{bg:"#f3f6f5",side:"#0b2b28",brand:"#0f5e57",acc:"#c08424"}],
   ["nazca","Granate Nazca","Granate y ocre, inspirado en la región Ica.",{bg:"#f7f4f3",side:"#2a0b10",brand:"#8a1c2b",acc:"#c8902e"}],
   ["pacifico","Azul Pacífico","Azul marino y turquesa, sobrio y formal.",{bg:"#f3f5f9",side:"#0b1a33",brand:"#1d4f9c",acc:"#0ea5b7"}],
-  ["web","Web institucional","Colores del portal institucional istpnasca.edu.pe. Puede ajustarlos abajo.",null]];
+  ["web","Web institucional","Colores del portal institucional istpalpa.edu.pe. Puede ajustarlos abajo.",null]];
 const WEB_DEF = {brand:"#ff4f01", acc:"#ff8c01", side:"#131d3b"};
 const HEX = /^#[0-9a-f]{6}$/i;
 const inkFor = hex => { const n = parseInt(hex.slice(1),16), c = [n>>16&255, n>>8&255, n&255].map(v => { v /= 255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4) }); return (.2126*c[0] + .7152*c[1] + .0722*c[2]) > .45 ? "#111111" : "#ffffff" };
@@ -2520,11 +2526,11 @@ const docSub = () => docCfg().sub || `${DB.cfg.direccion} · ${DB.cfg.web}`;
 const docFirmaNom = () => docCfg().firmaNom || DB.cfg.director;
 /* convierte cualquier imagen subida a PNG (jsPDF no acepta SVG) y guarda su proporción */
 function imgToPng(file, maxW){ return new Promise((ok, bad) => { const rd = new FileReader(); rd.onerror = () => bad(); rd.onload = () => { const im = new Image(); im.onerror = () => bad(); im.onload = () => { const w0 = im.naturalWidth || 300, h0 = im.naturalHeight || 300, k = Math.min(1, (maxW || 500) / Math.max(w0, h0)), cv = document.createElement("canvas"); cv.width = Math.round(w0*k); cv.height = Math.round(h0*k); cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height); ok({src:cv.toDataURL("image/png"), w:cv.width, h:cv.height}) }; im.src = rd.result }; rd.readAsDataURL(file) }) }
-const BRAND = [15,94,87];
+const BRAND = [19,29,59];
 function pdfNew(orient){ const {jsPDF} = window.jspdf; return new jsPDF({unit:"mm", format:"a4", orientation:orient || "portrait"}) }
 function pdfLogo(doc, img, x, y, box, align){
   if(!img || !img.src) return 0; const r = img.w / img.h, w = r >= 1 ? box : box * r, h = r >= 1 ? box / r : box;
-  try{ doc.addImage(img.src, "PNG", align === "right" ? x - w : x, y + (box - h)/2, w, h) }catch(e){ return 0 } return w;
+  try{ if(img.src.startsWith("/assets/palpa/")){doc.setFillColor(19,29,59);doc.rect(align === "right" ? x-w : x,y+(box-h)/2,w,h,"F");} doc.addImage(img.src, "PNG", align === "right" ? x - w : x, y + (box - h)/2, w, h) }catch(e){ return 0 } return w;
 }
 function pdfSeal(doc, x, y, d, col){ doc.setDrawColor(...col); doc.setLineWidth(.6); doc.circle(x + d/2, y + d/2, d/2); doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...col); doc.text(doc.splitTextToSize(DB.cfg.siglas, d - 2).slice(0, 2), x + d/2, y + d/2 - .6, {align:"center"}); doc.setLineWidth(.2) }
 function pdfHeader(doc, title, sub){
@@ -2591,7 +2597,7 @@ const unb64u = t => { const bin = atob(t.replace(/-/g,"+").replace(/_/g,"/")); r
 /* el QR abre la verificación pública con el código y los datos del documento */
 const verifyText = d => HOST.verifyUrl(d.cod);
 function paperHead(){ const C = docCfg(), col = docColor(), band = C.estilo !== "blanco", im = (x, cls) => `<img class="plogo ${cls}" src="${esc(x.src)}" alt="">`;
-  return `<div class="ph ${band ? "band" : ""}" style="--doc:${col}">${C.logoIzq ? im(C.logoIzq,"l") : ""}<div class="pht"><b>${esc(DB.cfg.nombre)}</b><small>${esc(docSub())}</small></div>${C.logoDer ? im(C.logoDer,"r") : band ? "" : `<div class="seal" style="box-shadow:inset 0 0 0 2px ${col};color:${col};background:none">IESTP<br>NASCA</div>`}</div>${C.lema ? `<p class="lema">“${esc(C.lema)}”</p>` : ""}` }
+  return `<div class="ph ${band ? "band" : ""}" style="--doc:${col}">${C.logoIzq ? im(C.logoIzq,"l") : ""}<div class="pht"><b>${esc(DB.cfg.nombre)}</b><small>${esc(docSub())}</small></div>${C.logoDer ? im(C.logoDer,"r") : band ? "" : `<div class="seal" style="box-shadow:inset 0 0 0 2px ${col};color:${col};background:none">IES<br>PALPA</div>`}</div>${C.lema ? `<p class="lema">“${esc(C.lema)}”</p>` : ""}` }
 function paperSign(){ const C = docCfg(); return C.firma ? `<div class="pfirma">${C.firmaImg ? `<img src="${esc(C.firmaImg.src)}" alt="Firma">` : ""}<span></span><b>${esc(docFirmaNom())}</b><small>${esc(C.firmaCargo || "")}</small></div>` : "" }
 function paperFoot(d){ const pie = docCfg().pie; return paperSign() + `<div class="pf"><div><b style="color:var(--paper-ink)">Código de verificación: <span class="mono">${d.cod}</span></b><br>Emitido el ${fd(d.fecha)} · Verifique su autenticidad en el portal institucional, opción “Verificar documento”.</div><div class="qr" aria-label="Código QR de verificación">${qrSvg(verifyText(d))}</div></div>${pie ? `<p class="ppie">${esc(pie)}</p>` : ""}` }
 function pdfVerify(doc, d, y){
@@ -2844,7 +2850,7 @@ const plazoRec = r => { const due = addBiz(r.fecha, DB.cfg.plazoReclamo); return
 function renderLogin(){
   const demo = HOST.users().filter(u => u.estado === "Activo");
   return `<div class="login">
-  <section class="lb"><div class="brandbox" style="border:0;padding:0">${sealHtml()}<div><b>${esc(DB.cfg.siglas)}</b><small>Ministerio de Educación · DRE Ica · Nasca</small></div></div>
+  <section class="lb"><div class="brandbox" style="border:0;padding:0">${sealHtml()}<div><b>${esc(DB.cfg.siglas)}</b><small>Ministerio de Educación · DRE Ica · Palpa</small></div></div>
     <h1>Intranet Institucional</h1>
     <p>Plataforma de gestión académica y administrativa: horarios, certificaciones, títulos, trámite documentario, libro de reclamaciones, bolsa laboral y portafolio docente en un solo sistema.</p>
     <div class="mods">${MODS.filter(m => m[2]).map(m => `<div>${ICO[m[0]] || ""}<span>${m[2]}</span>${m[1]}</div>`).join("")}</div>
@@ -3810,7 +3816,7 @@ function docsConfig(){
     <div class="fld"><label for="dc_fc">Cargo</label><input id="dc_fc" name="firmaCargo" value="${esc(C.firmaCargo)}" maxlength="80" ${ro}></div></div>
     ${logo("firmaImg","Imagen de la firma (opcional)","Una firma escaneada sobre fondo blanco o transparente.")}</section>
   <section class="panel"><div><h2>Pie de página</h2></div>
-    <div class="fld"><label for="dc_pie">Texto del pie</label><input id="dc_pie" name="pie" value="${esc(C.pie)}" placeholder="Ej.: Av. Guardia Civil s/n, Panamericana Sur km 449, Nasca · mesapartes2020@istpnasca.edu.pe" maxlength="160" ${ro}></div></section>
+    <div class="fld"><label for="dc_pie">Texto del pie</label><input id="dc_pie" name="pie" value="${esc(C.pie)}" placeholder="Ej.: Mz. P Lote 34, Río Grande, Palpa · mesadepartes@istpalpa.edu.pe" maxlength="160" ${ro}></div></section>
   ${ed ? `<div class="btnrow"><button class="btn" type="submit">Guardar textos</button><button type="button" class="btn sec" data-act="docSample">Descargar PDF de ejemplo</button><button type="button" class="btn ghost" data-act="docReset">Restablecer</button></div>` : ""}
   </form></div>
   <aside class="ap-preview"><section class="panel"><h2>Vista previa</h2><div class="paper" style="padding:22px;--pp:22px;--pp2:22px;gap:10px;font-size:.86rem">${paperHead()}<h2 style="font-size:1rem">REPORTE DE VALIDACIÓN DE TÍTULO</h2><dl class="dl"><dt>Titulado(a)</dt><dd>Nombre de ejemplo</dd><dt>Programa</dt><dd>${esc((DB.programas[0]||{}).nombre || "Programa de estudios")}</dd></dl>${paperFoot(sample)}</div></section></aside></div>`;
@@ -4381,7 +4387,7 @@ const bic = n => `<svg viewBox="0 0 24 24" aria-hidden="true">${BRAND[n]}</svg>`
 const THEME_FONTS = { Montserrat: '"Montserrat","Inter",system-ui,Arial,sans-serif', Poppins: '"Poppins","Inter",system-ui,Arial,sans-serif', Merriweather: '"Merriweather",Georgia,"Times New Roman",serif', Inter: '"Inter",system-ui,Arial,sans-serif' };
 const BODY_FONTS = { Inter: '"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif', Poppins: '"Poppins","Inter",system-ui,Arial,sans-serif', Sistema: 'system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif' };
 const THEME_DEFAULTS = {
-  pisco: { label: 'Nasca institucional', desc: 'Tema del portal institucional de Nasca', modo: 'claro', navy: '#0b1d3f', navy2: '#123a7a', blue: '#0a7fc2', gold: '#f5c400', fh: 'Montserrat', ff: 'Inter', r: 12, base: true },
+  pisco: { label: 'Palpa institucional', desc: 'Tema del portal institucional de Palpa', modo: 'claro', navy: '#131d3b', navy2: '#1c335b', blue: '#bd3d00', gold: '#ff6a00', fh: 'Montserrat', ff: 'Inter', r: 12, base: true },
   institucional: { label: 'Institucional', desc: 'Azul marino y dorado', modo: 'claro', navy: '#0a2a5e', navy2: '#0d3a80', blue: '#1556b8', gold: '#f2b705', fh: 'Montserrat', ff: 'Inter', r: 12, base: true },
   esmeralda: { label: 'Esmeralda', desc: 'Verde y ámbar', modo: 'claro', navy: '#0b3d2e', navy2: '#0f5a42', blue: '#12805a', gold: '#f4b400', fh: 'Poppins', ff: 'Inter', r: 16, base: true },
   vino: { label: 'Académico', desc: 'Vino y oro, títulos con serifa', modo: 'claro', navy: '#4a0f1f', navy2: '#6d1a2e', blue: '#9e2238', gold: '#d9a520', fh: 'Merriweather', ff: 'Inter', r: 6, base: true },
@@ -4425,7 +4431,7 @@ function logoSVG(sigla = 'CH') {
   for (let i = 0; i < 16; i++) { const a = i * 22.5; teeth += `<rect x="46" y="2" width="8" height="12" rx="1.5" fill="${TC.gold}" transform="rotate(${a} 50 50)"/>`; }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${teeth}<circle cx="50" cy="50" r="40" fill="${TC.gold}"/><circle cx="50" cy="50" r="34" fill="${TC.navy}"/><circle cx="50" cy="50" r="34" fill="none" stroke="#fff" stroke-width="1"/><path d="M30 56h40v4H30z" fill="${TC.gold}"/><path d="M33 56c0-9 7.5-16 17-16s17 7 17 16" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M50 26v14M44 32l6-6 6 6" stroke="${TC.gold}" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M36 48l14-5 14 5" stroke="#fff" stroke-width="2" fill="none"/><text x="50" y="72" text-anchor="middle" font-family="Arial,Helvetica" font-weight="900" font-size="8.5" fill="#fff" letter-spacing=".5">${esc(sigla)}</text><text x="50" y="80" text-anchor="middle" font-family="Arial" font-size="5" fill="${TC.gold}">I.E.S.P.</text></svg>`;
 }
-function campusSVG(seed = 1, w = 1600, h = 600, label = 'IESTP NASCA') {
+function campusSVG(seed = 1, w = 1600, h = 600, label = 'IES PALPA') {
   const r = hashStr('c' + seed); const sky = r % 2 ? ['#5aa4e8', '#cfe6fb'] : ['#3d8fdf', '#e3f1fd'];
   let palms = '';
   for (let i = 0; i < 4; i++) { const x = 120 + i * 430 + (r >> i) % 60; palms += `<g transform="translate(${x} ${h - 70})"><path d="M0 0 C 6 -90 0 -160 10 -230" stroke="#6b4f2a" stroke-width="12" fill="none"/>${[0, 1, 2, 3, 4, 5].map(k => `<path d="M10 -230 q ${-90 + k * 36} ${-30 + Math.abs(k - 2.5) * 22} ${-110 + k * 44} ${40 + Math.abs(k - 2.5) * 18}" stroke="#2f7d3a" stroke-width="14" fill="none" stroke-linecap="round"/>`).join('')}</g>`; }
@@ -4756,11 +4762,11 @@ function parseCSV(text) {
 
 /* ==== data.js ==== */
 /* =========================================================
-   DATOS DE DEMOSTRACIÓN
+   CARGA INSTITUCIONAL
    Todo lo que aparece aquí es editable desde el panel.
-   Nombres de docentes, estudiantes, montos y cifras son ficticios.
+   La carga institucional proviene de portal.json; las operaciones académicas se gestionan en el panel.
    ========================================================= */
-const SEED_VERSION = 13; // v13: Portal Web 2026 del IESTP NASCA (plana docente con CV, libro de reclamaciones, bolsa laboral y mesa de partes)
+const SEED_VERSION = 13; // v13: Portal Web 2026 del IES PALPA (plana docente con CV, libro de reclamaciones, bolsa laboral y mesa de partes)
 function seedDB() { throw new Error('Los datos se inicializan en PHP y MySQL.'); }
 const DEMO_USERS = [];
 
@@ -4781,7 +4787,7 @@ const sortO = a => a.slice().sort((x, y) => (x.orden || 0) - (y.orden || 0));
 const page = clave => P('paginas').find(p => p.clave === clave);
 const persona = id => P('personas').find(p => p.id === id);
 const fullName = p => p ? `${p.titulo ? p.titulo + ' ' : ''}${p.nombres} ${p.apellidos}` : '';
-const publicTeacherVisible = p => !p?.cv?.autoriza?.revocado && (p?.cv?.autoriza?.ok === true || /^https:\/\/(www\.)?istpnasca\.edu\.pe\/(?:plana-docente|directorio-institucional|11298-2)\//.test(p?.fuente || ''));
+const publicTeacherVisible = p => !p?.cv?.autoriza?.revocado && (p?.cv?.autoriza?.ok === true || /^https:\/\/(www\.)?istpalpa\.edu\.pe\/(?:docentes|jerarquicos)\.html(?:[?#]|$)/.test(p?.fuente || ''));
 const progs = () => sortO(P('programas').filter(isPub));
 const progById = id => P('programas').find(p => p.id === id);
 const safePortalLink = (value, internal = true) => { if (typeof value !== 'string' || !value) return false; if (internal && value.startsWith('#/')) return true; try { const url = new URL(value); return ['http:', 'https:'].includes(url.protocol); } catch { return false; } };
@@ -4846,7 +4852,7 @@ function footerHTML() {
     <section class="f-col f-about"><a class="f-brand" href="#/"><img src="${logoSrc()}" alt=""><span><strong>${esc(i.nombreCorto)}</strong><small>${esc(i.nombre)}</small></span></a><p>${esc(i.descripcion)}</p>${soc ? `<div class="social f-social" aria-label="Redes sociales">${soc}</div>` : ''}</section>
     <nav class="f-col" aria-label="Enlaces del pie de página"><h2>Enlaces rápidos</h2><ul class="f-links">${links.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join('')}</ul></nav>
     <section class="f-col"><h2>Contacto</h2><ul class="f-contact">${ci('map', 'Dirección', `<span>${esc(i.direccion)}</span>`)}${ci('phone', 'Teléfono' + (i.telefonoNota ? ' · ' + esc(i.telefonoNota) : ''), `<a href="tel:${esc(i.telefono.replace(/\D/g, ''))}">${esc(i.telefono)}</a>`)}${ci('mail', 'Correo', `<a href="mailto:${esc(i.correo)}">${esc(i.correo)}</a>`)}${ci('clock', 'Horario de atención', `<span>${esc(i.horario)}</span>`)}</ul></section>
-    <section class="f-col"><h2>Boletín informativo</h2><p>Registra tu interés en recibir el boletín institucional. El envío por correo se habilitará posteriormente.</p><form class="newsletter" data-newsletter style="flex-wrap:wrap"><details style="flex-basis:100%;color:#102b50;background:#fff;padding:8px"><summary>Verificación y privacidad</summary>${captchaHTML('cap-nl')}<label><input type="checkbox" name="acepto" required> Acepto la política de privacidad.</label></details><label class="sr-only" for="nl">Correo electrónico</label><input id="nl" type="email" placeholder="mesapartes2020@istpnasca.edu.pe" required><button>Suscribirme</button></form>
+    <section class="f-col"><h2>Boletín informativo</h2><p>Registra tu interés en recibir el boletín institucional. El envío por correo se habilitará posteriormente.</p><form class="newsletter" data-newsletter style="flex-wrap:wrap"><details style="flex-basis:100%;color:#102b50;background:#fff;padding:8px"><summary>Verificación y privacidad</summary>${captchaHTML('cap-nl')}<label><input type="checkbox" name="acepto" required> Acepto la política de privacidad.</label></details><label class="sr-only" for="nl">Correo electrónico</label><input id="nl" type="email" placeholder="correo@ejemplo.com" required><button>Suscribirme</button></form>
       <h2 class="f-h2b">Enlaces institucionales</h2><div class="f-logos"><a ${linkAttrs(ext('minedu') || 'https://www.gob.pe/minedu')}>MINEDU</a><a ${linkAttrs(ext('dre') || 'https://www.dreica.gob.pe/')}>DRE Ica</a><a href="#/servicios/libro-de-reclamaciones" class="f-lr">${ic('book')} Libro de Reclamaciones</a></div></section>
   </div>
   <div class="f-bottom"><div class="wrap"><span>© ${yearNow()} ${esc(i.nombre)}. Todos los derechos reservados.</span><nav aria-label="Enlaces legales"><a href="#/terminos-de-uso">Términos de uso</a><a href="#/politica-de-privacidad">Política de privacidad</a><a href="#/mapa-del-sitio">Mapa del sitio</a><a href="#/admin">Intranet</a></nav></div></div></footer>
@@ -4880,7 +4886,7 @@ function setSEO({ title, desc, crumbs = [], jsonld = [] }) {
   setMeta('meta[name="description"]', 'content', desc || s.descripcion);
   setMeta('meta[property="og:title"]', 'content', document.title);
   setMeta('meta[property="og:description"]', 'content', desc || s.descripcion);
-  const org = { '@context': 'https://schema.org', '@type': 'EducationalOrganization', name: inst().nombre, alternateName: inst().nombreCorto, foundingDate: inst().fechaCreacion, email: inst().correo, telephone: inst().telefono, address: { '@type': 'PostalAddress', streetAddress: inst().direccion, addressLocality: 'Nasca', addressRegion: 'Ica', addressCountry: 'PE' }, sameAs: Object.values(DB.config.redes).filter(Boolean) };
+  const org = { '@context': 'https://schema.org', '@type': 'EducationalOrganization', name: inst().nombre, alternateName: inst().nombreCorto, foundingDate: inst().fechaCreacion, email: inst().correo, telephone: inst().telefono, address: { '@type': 'PostalAddress', streetAddress: inst().direccion, addressLocality: inst().localidad || 'Palpa', addressRegion: 'Ica', addressCountry: 'PE' }, sameAs: Object.values(DB.config.redes).filter(Boolean) };
   const bc = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Inicio', item: location.origin + location.pathname + '#/' }].concat(crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 2, name: c[0], item: c[1] ? location.origin + location.pathname + c[1] : undefined }))) };
   let el = document.getElementById('jsonld'); if (!el) { el = document.createElement('script'); el.type = 'application/ld+json'; el.id = 'jsonld'; document.head.appendChild(el); }
   el.textContent = JSON.stringify([org, bc].concat(jsonld));
@@ -5093,8 +5099,8 @@ R('programas/:slug', (path, q, prm) => {
   const body = `
    <section class="block">${hblock('target', 'Perfil de egreso')}<div class="prose">${sanitize(p.perfil)}</div></section>
    <details class="block program-fold" data-program-section="campo-laboral"><summary>${hblock('briefcase', 'Campo laboral')}</summary><div class="program-fold-body"><ul class="fields-list">${(p.campoItems || []).filter(Boolean).map(c => `<li>${esc(c)}</li>`).join('')}</ul></div></details>
-   <details class="block program-fold" data-program-section="malla-curricular"><summary>${hblock('layers', 'Malla curricular')}</summary><div class="program-fold-body"><p>Certificación modular publicada: ${p.modulos.length} módulos profesionales.${totalC ? ` Total transcrito: ${totalC} créditos.` : ' Consulta las unidades didácticas, horas y créditos en el itinerario oficial descargable.'}</p>${p.modulos.map((m, i) => `<details class="mod"><summary>${esc(m.codigo)} · ${esc(m.nombre)}</summary><div class="tbl-wrap" style="border:0;border-radius:0"><table class="tbl light"><thead><tr><th>Semestre</th><th>Unidad didáctica</th><th class="num">Créditos</th><th class="num">Horas</th></tr></thead><tbody>${m.uds.length ? '' : '<tr><td colspan="4">Unidades didácticas, créditos y horas en el PDF oficial del itinerario formativo.</td></tr>'}${m.uds.map(u => `<tr><td>${esc(u.semestre)}</td><td>${esc(u.nombre)}</td><td class="num">${esc(u.creditos)}</td><td class="num">${esc(u.horas)}</td></tr>`).join('')}<tr><td colspan="4"><b>Experiencias formativas en situaciones reales de trabajo:</b> ${esc(m.efsrt || '—')}</td></tr></tbody></table></div></details>`).join('')}</div></details>
-   <section class="block grid g2">${dl(p.brochure, 'Brochure del programa', 'Conoce más sobre el programa, perfil, competencias y oportunidades.')}${dl(p.malla, 'Itinerario formativo publicado (2024)', 'PDF oficial de 2024; consultar actualizaciones con el programa.', '#1e7e34', 'PDF')}</section>
+   <details class="block program-fold" data-program-section="malla-curricular"><summary>${hblock('layers', 'Malla curricular')}</summary><div class="program-fold-body"><p>Certificación modular publicada: ${p.modulos.length} módulos profesionales.${totalC ? ` Total transcrito: ${totalC} créditos.` : ' Unidades didácticas transcritas de la ficha oficial. Horas y créditos no publicados en esa ficha.'}</p>${p.modulos.map((m, i) => `<details class="mod"><summary>${esc(m.codigo)} · ${esc(m.nombre)}</summary><div class="tbl-wrap" style="border:0;border-radius:0"><table class="tbl light"><thead><tr><th>Semestre</th><th>Unidad didáctica</th><th class="num">Créditos</th><th class="num">Horas</th></tr></thead><tbody>${m.uds.length ? '' : '<tr><td colspan="4">Unidades didácticas, créditos y horas en el PDF oficial del itinerario formativo.</td></tr>'}${m.uds.map(u => `<tr><td>${esc(u.semestre)}</td><td>${esc(u.nombre)}</td><td class="num">${esc(u.creditos ?? '—')}</td><td class="num">${esc(u.horas ?? '—')}</td></tr>`).join('')}<tr><td colspan="4"><b>Experiencias formativas en situaciones reales de trabajo:</b> ${esc(m.efsrt || '—')}</td></tr></tbody></table></div></details>`).join('')}</div></details>
+   <section class="block grid g2">${dl(p.brochure, 'Brochure del programa', 'Conoce más sobre el programa, perfil, competencias y oportunidades.')}${dl(p.malla, 'Itinerario formativo publicado', 'Consulta la información curricular del programa.', '#1e7e34', 'PDF')}</section>
    ${coord ? `<section class="block">${hblock('user', 'Coordinación del programa')}<div class="card" style="display:flex;gap:16px;padding:16px;align-items:center;flex-wrap:wrap"><img src="${img(coord.foto)}" alt="Fotografía de ${esc(fullName(coord))}" style="width:96px;height:96px;border-radius:50%;object-fit:cover"><div style="flex:1;min-width:220px"><strong style="color:var(--hc)">${esc(fullName(coord))}</strong><br><small style="color:var(--muted)">Coordinador(a) del programa · <a href="mailto:${esc(coord.correo)}">${esc(coord.correo)}</a></small>${p.coordinadorMsg ? `<p style="margin:6px 0 0;font-style:italic">“${esc(p.coordinadorMsg)}”</p>` : ''}</div></div></section>` : ''}
    <section class="block">${hblock('users', 'Plana docente del programa')}${ds.length ? `<div class="grid g4">${ds.map(d => `<article class="card tcard"><img src="${img(d.foto)}" alt="Fotografía de ${esc(fullName(d))}" loading="lazy"><div class="cb"><strong>${esc(fullName(d))}</strong><small>${esc(d.especialidad)}</small><button class="btn xs sec" data-prof="${d.id}">Ver perfil</button></div></article>`).join('')}</div>` : emptyMsg('docentes')}</section>
    ${(p.convenios || []).length ? `<section class="block">${hblock('building', 'Convenios para EFSRT')}<ul>${p.convenios.map(c => `<li>${esc(c)}</li>`).join('')}</ul></section>` : ''}
@@ -5118,7 +5124,7 @@ R('admision', (path, q) => {
   const uit = DB.config.uit[DB.tupaDocs.anio] || 0;
   const tbtn = (pid, t) => { const r = (a.resultados[pid] || {})[t]; return r ? `<button class="btn xs violet" data-res="${pid}|${t}">Ver Resultados</button>` : '<span aria-label="Sin resultados publicados" style="color:var(--muted)">—</span>'; };
   const body = `<p style="text-align:center;margin:0;color:var(--link);font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:13px">${a.inscripcionesAbiertas === true ? 'Inscripciones abiertas' : 'Información del proceso publicado'}</p><h1 style="text-align:center;padding-bottom:0" class="noline">${esc(a.titulo)}</h1>${a.descripcion ? `<p class="lead" style="text-align:center;max-width:760px;margin:0 auto 16px">${esc(a.descripcion)}</p>` : ''}
-   ${!a.vigente ? `<div class="notice warn">Estás consultando el proceso ${esc(a.anio)}, que ya concluyó. <a href="#/admision">Ver el proceso vigente</a>.</div>` : ''}
+   ${!a.vigente ? `<div class="notice warn">Estás consultando el proceso ${esc(a.anio)}, que ya concluyó. Consulta próximas convocatorias con la institución.</div>` : ''}
    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:14px 0 22px">${a.prospecto ? `<button class="btn" data-docx="prospecto">${ic('file').replace('<svg', '<svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"')} ${esc(prospectusLabel(a.prospecto))}</button><button class="btn ghost sm" data-dlx="prospecto" aria-label="Descargar ${esc(prospectusLabel(a.prospecto))}">${ic('download').replace('<svg', '<svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2"')}</button>` : ''}${a.reglamento ? `<button class="btn" data-docx="reglamento">${ic('file').replace('<svg', '<svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"')} REGLAMENTO DE ADMISIÓN</button><button class="btn ghost sm" data-dlx="reglamento" aria-label="Descargar reglamento">${ic('download').replace('<svg', '<svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2"')}</button>` : ''}</div>
    <section><h2>Resultados por programa de estudio</h2><div class="tbl-wrap"><table class="tbl"><caption class="sr-only">Resultados del proceso de admisión ${esc(a.anio)} por programa y turno</caption><thead><tr><th class="c">N.º</th><th>Programa de estudio</th><th class="c">Resultados oficiales</th></tr></thead><tbody>${progs().map((p, i) => `<tr><td class="c">${i + 1}</td><td>${esc(p.nombre)}</td><td class="c">${tbtn(p.id, Object.keys(a.resultados[p.id] || {})[0])}</td></tr>`).join('')}</tbody></table></div></section>
    <div class="grid g2" style="margin-top:22px">
@@ -5299,7 +5305,7 @@ R('transparencia/licenciamiento', path => {
   const L = DB.licenciamiento;
   const body = `<h1>Licenciamiento</h1><div class="card cb" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:16px"><span class="kpi" style="box-shadow:none;border:0;padding:0"><span class="ic" style="background:${L.estado === 'Licenciado' ? 'var(--ok)' : 'var(--warn)'}">${ic(L.estado === 'Licenciado' ? 'shield' : 'clock')}</span></span><div><small style="color:var(--muted)">Estado del licenciamiento</small><div style="font-family:var(--fh);font-size:22px;color:var(--hc);font-weight:800">${esc(L.estado)}</div><div>${esc(L.etapa)}</div></div></div>
    <p>${esc(L.descripcion)}</p>
-   ${L.resolucion ? `<dl class="kv"><dt>Resolución</dt><dd>${esc(L.resolucion)}</dd><dt>Fecha</dt><dd>${esc(L.fechaResolucion)}</dd><dt>Vigencia hasta</dt><dd>${esc(L.vigenciaHasta)}</dd></dl>` : ''}
+   ${L.resolucion ? `<dl class="kv"><dt>Resolución</dt><dd>${esc(L.resolucion)}</dd><dt>Fecha</dt><dd>${esc(L.fechaResolucion)}</dd><dt>Vigencia hasta</dt><dd>${esc(L.vigenciaHasta || "Seis años renovables, según el artículo 1 de la resolución")}</dd></dl>` : ''}
    <h2>Avance del proceso</h2><div class="timeline">${(L.hitos || []).map(h => `<div class="it"><span class="y">${fshort(h.fecha + 'T12:00:00')}</span><p style="margin:0">${esc(h.texto)}</p></div>`).join('')}</div>
    ${(L.documentos || []).length ? `<h2>Documentos</h2><ul>${L.documentos.map((d, i) => `<li><a href="#" data-ld="${i}">${esc(d.nombre)}</a></li>`).join('')}</ul>` : ''}
    <p style="font-size:12.5px;color:var(--muted)">Información actualizada al ${fdate(L.modEn)}.</p>`;
@@ -5317,7 +5323,7 @@ R('transparencia/tupa', (path, q) => {
     html, after: () => {
       const f = $('[data-tf]');
       const run = () => { const s = normTitle(f.s.value), c = f.c.value; const rs = rows.filter(r => (!c || r.categoria === c) && (!s || normTitle(r.denominacion + ' ' + r.codigo).includes(s)));
-        $('#tres').innerHTML = rs.length ? `<p role="status">${rs.length} concepto(s)</p><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Código</th><th>Categoría</th><th>Denominación</th><th class="num">Monto</th><th class="num">% UIT</th><th>Lugar de pago</th></tr></thead><tbody>${rs.map(r => `<tr><td>${esc(r.codigo)}</td><td>${esc(r.categoria)}</td><td>${esc(r.denominacion)}</td><td class="num"><b>${money(r.monto)}</b></td><td class="num">${uit ? (r.monto / uit * 100).toFixed(2) + ' %' : '—'}</td><td><small>${esc(r.cuenta)}</small></td></tr>`).join('')}</tbody></table></div>` : `<div class="empty" role="status">No hay conceptos que coincidan con la búsqueda.</div>`; };
+        $('#tres').innerHTML = rs.length ? `<p role="status">${rs.length} concepto(s)</p><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Código</th><th>Categoría</th><th>Denominación</th><th class="num">Monto</th><th class="num">% UIT</th><th>Lugar de pago</th></tr></thead><tbody>${rs.map(r => `<tr><td>${esc(r.codigo)}</td><td>${esc(r.categoria)}</td><td>${esc(r.denominacion)}</td><td class="num"><b>${money(r.monto)}${r.unidad === 'Por hoja' ? ' / hoja' : ''}</b></td><td class="num">${uit ? (r.monto / uit * 100).toFixed(2) + ' %' : '—'}</td><td><small>${esc(r.cuenta)}</small></td></tr>`).join('')}</tbody></table></div>` : `<div class="empty" role="status">No hay conceptos que coincidan con la búsqueda.</div>`; };
       f.oninput = run; f.onsubmit = e => e.preventDefault(); $('[data-clear]').onclick = () => { f.reset(); run(); }; run();
       $$('[data-td]').forEach(b => b.onclick = () => openDoc(DB.tupaDocs[b.dataset.td]));
     }
@@ -5329,7 +5335,7 @@ R('transparencia/estadisticas', (path, q) => {
   const tot = (y, k) => { const rows = st.filter(s => s.anio === y && s[k] != null); return rows.length ? rows.reduce((a,s) => a + (+s[k] || 0), 0) : null; };
   const chart = (k, t) => `<figure class="card cb chart-card" style="margin:0"><h3>${t}</h3><figcaption style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Total institucional por año (${last5[0]}–${last5[last5.length - 1]})</figcaption>${barChart(last5.filter(y => tot(y,k) != null).map(y => ({ k: String(y), v: tot(y, k) })), { label: t + ' por año' })}</figure>`;
   const rows = progs().map(p => ({ p, s: st.find(x => x.anio === sel && x.programaId === p.id) || {} }));
-  const body = `<h1>Estadísticas institucionales</h1><p class="lead">Estadísticas por programa publicadas en el portal oficial. Los totales se calculan sumando las filas; pueden diferir del total escrito en la fuente. Una raya indica que el dato no está publicado, no que sea cero.</p>
+  const body = `<h1>Estadísticas institucionales</h1>${st.some(s => s.nota) ? `<p class="notice">${esc(st.find(s => s.nota).nota)}</p>` : ''}<p class="lead">Estadísticas por programa publicadas en el portal oficial. Los totales se calculan sumando las filas; pueden diferir del total escrito en la fuente. Una raya indica que el dato no está publicado, no que sea cero.</p>
    ${st.length ? `<div class="grid g3">${chart('ingresantes', 'Ingresantes')}${chart('matriculados', 'Matriculados')}${chart('egresados', 'Egresados')}</div>
    <h2>Detalle por programa de estudio</h2><div class="chips" role="group" aria-label="Año">${years.map(y => `<button class="chip" data-y="${y}" aria-pressed="${y === sel}">${y}</button>`).join('')}</div>
    <div class="tbl-wrap"><table class="tbl"><caption class="sr-only">Estadísticas ${sel} por programa</caption><thead><tr><th>Programa de estudio</th><th class="num">Postulantes</th><th class="num">Ingresantes</th><th class="num">Matriculados</th><th class="num">Egresados</th><th class="num">Titulados</th><th class="num">Becas</th><th class="num">Créditos educ.</th></tr></thead><tbody>${rows.map(({ p, s }) => `<tr><td>${esc(p.nombre)}</td>${['postulantes', 'ingresantes', 'matriculados', 'egresados', 'titulados', 'becas', 'creditos'].map(k => `<td class="num">${s[k] != null ? num(s[k]) : '—'}</td>`).join('')}</tr>`).join('')}<tr style="font-weight:700;background:var(--sky)"><td>Total ${sel}</td>${['postulantes', 'ingresantes', 'matriculados', 'egresados', 'titulados', 'becas', 'creditos'].map(k => `<td class="num">${tot(sel,k) == null ? '—' : num(tot(sel, k))}</td>`).join('')}</tr></tbody></table></div>
@@ -5439,7 +5445,7 @@ R('noticias/:slug', (path, q, prm) => {
   const n = P('noticias').find(x => x.slug === prm.slug && newsVisible(x));
   if (!n) return notFound(path);
   const rel = pubNews().filter(x => x.id !== n.id && x.categoriaId === n.categoriaId).slice(0, 3);
-  const url = location.protocol === 'file:' ? 'https://istpnasca.edu.pe/' + location.hash : location.href;
+  const url = location.protocol === 'file:' ? 'https://istpalpa.edu.pe/' + location.hash : location.href;
   const body = `<article><header><div class="meta" style="display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13.5px"><time datetime="${esc(n.fecha)}">${fdate(n.fecha, true)}</time><span class="badge">${esc(catName(n.categoriaId))}</span></div><h1>${esc(n.titulo)}</h1><p class="lead">${esc(n.resumen)}</p></header>
    ${n.video ? `<div style="aspect-ratio:16/9;margin-bottom:16px"><iframe src="${esc(n.video)}" title="Video: ${esc(n.titulo)}" style="width:100%;height:100%;border:0;border-radius:10px" allowfullscreen loading="lazy"></iframe></div>` : `<figure class="figure"><img src="${img(n.imagen, 'ph:campus:4')}" alt="Imagen de la noticia: ${esc(n.titulo)}" data-fit="${newsImageFit(n)}" decoding="async"><figcaption>${esc(n.titulo)}</figcaption></figure>`}
    <div class="prose">${sanitize(n.contenido)}</div>
@@ -5469,7 +5475,7 @@ R('mapa-del-sitio', path => {
   return { html: shell(path, { title: 'Mapa del sitio', crumbs: [['Mapa del sitio']], banner: { title: 'Mapa del sitio' }, side: null, body }), after: () => $('[data-sm]').onclick = downloadSitemap };
 });
 function downloadSitemap() {
-  const base = 'https://istpnasca.edu.pe';
+  const base = 'https://istpalpa.edu.pe';
   const urls = ['/', '/programas', '/admision', '/matricula', '/becas', '/noticias', '/eventos', '/contacto', '/preguntas-frecuentes', '/mapa-del-sitio', '/servicios/mesa-de-partes', '/servicios/bolsa-laboral', '/servicios/consulta-certificados', '/servicios/complementarios'].concat(['presentacion', 'resena-historica', 'mision-vision', 'organizacion', 'reconocimientos', 'plana-jerarquica', 'plana-docente', 'campus-e-informes'].map(s => '/nosotros/' + s)).concat(['documentos-gestion', 'inversiones', 'libro-de-reclamaciones', 'licenciamiento', 'tupa', 'estadisticas', 'convocatorias'].map(s => '/transparencia/' + s)).concat(progs().map(p => '/programas/' + p.slug)).concat(pubNews().map(n => '/noticias/' + n.slug));
   downloadText(`\x3c?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `  <url><loc>${base}${u}</loc></url>`).join('\n')}\n</urlset>`, 'sitemap.xml', 'application/xml');
 }
@@ -6104,7 +6110,7 @@ SPECS.programas = {
   },
 };
 function mallaHTML(w) {
-  return `<div data-malla>${(w.modulos || []).map((m, i) => `<div class="mod" style="padding:10px"><div style="display:grid;grid-template-columns:90px 1fr 170px auto;gap:6px;align-items:center;margin-bottom:6px"><input class="inp" value="${esc(m.codigo)}" data-mm="${i}|codigo" aria-label="Código del módulo"><input class="inp" value="${esc(m.nombre)}" data-mm="${i}|nombre" aria-label="Nombre del módulo" placeholder="Nombre del módulo"><input class="inp" value="${esc(m.efsrt || '')}" data-mm="${i}|efsrt" aria-label="EFSRT" placeholder="EFSRT"><button type="button" class="icon-btn del" data-mdel="${i}" title="Quitar módulo">${ic('trash')}</button></div><table class="tbl light subtbl"><thead><tr><th style="width:70px">Sem.</th><th>Unidad didáctica</th><th style="width:80px">Créditos</th><th style="width:80px">Horas</th><th style="width:40px"></th></tr></thead><tbody>${m.uds.map((u, j) => `<tr><td><input class="inp" type="number" min="1" max="10" value="${esc(u.semestre)}" data-mu="${i}|${j}|semestre" aria-label="Semestre"></td><td><input class="inp" value="${esc(u.nombre)}" data-mu="${i}|${j}|nombre" aria-label="Unidad didáctica"></td><td><input class="inp" type="number" min="0" value="${esc(u.creditos)}" data-mu="${i}|${j}|creditos" aria-label="Créditos"></td><td><input class="inp" type="number" min="0" value="${esc(u.horas)}" data-mu="${i}|${j}|horas" aria-label="Horas"></td><td><button type="button" class="icon-btn del" data-udel="${i}|${j}" title="Quitar UD">${ic('x')}</button></td></tr>`).join('')}</tbody></table><button type="button" class="btn xs ghost" data-uadd="${i}" style="margin-top:6px">+ Agregar unidad didáctica</button></div>`).join('')}<button type="button" class="btn xs sec" data-madd>+ Agregar módulo profesional</button></div>`;
+  return `<div data-malla>${(w.modulos || []).map((m, i) => `<div class="mod" style="padding:10px"><div style="display:grid;grid-template-columns:90px 1fr 170px auto;gap:6px;align-items:center;margin-bottom:6px"><input class="inp" value="${esc(m.codigo)}" data-mm="${i}|codigo" aria-label="Código del módulo"><input class="inp" value="${esc(m.nombre)}" data-mm="${i}|nombre" aria-label="Nombre del módulo" placeholder="Nombre del módulo"><input class="inp" value="${esc(m.efsrt || '')}" data-mm="${i}|efsrt" aria-label="EFSRT" placeholder="EFSRT"><button type="button" class="icon-btn del" data-mdel="${i}" title="Quitar módulo">${ic('trash')}</button></div><table class="tbl light subtbl"><thead><tr><th style="width:70px">Sem.</th><th>Unidad didáctica</th><th style="width:80px">Créditos</th><th style="width:80px">Horas</th><th style="width:40px"></th></tr></thead><tbody>${m.uds.map((u, j) => `<tr><td><input class="inp" type="number" min="1" max="10" value="${esc(u.semestre)}" data-mu="${i}|${j}|semestre" aria-label="Semestre"></td><td><input class="inp" value="${esc(u.nombre)}" data-mu="${i}|${j}|nombre" aria-label="Unidad didáctica"></td><td><input class="inp" type="number" min="0" value="${esc(u.creditos ?? '—')}" data-mu="${i}|${j}|creditos" aria-label="Créditos"></td><td><input class="inp" type="number" min="0" value="${esc(u.horas ?? '—')}" data-mu="${i}|${j}|horas" aria-label="Horas"></td><td><button type="button" class="icon-btn del" data-udel="${i}|${j}" title="Quitar UD">${ic('x')}</button></td></tr>`).join('')}</tbody></table><button type="button" class="btn xs ghost" data-uadd="${i}" style="margin-top:6px">+ Agregar unidad didáctica</button></div>`).join('')}<button type="button" class="btn xs sec" data-madd>+ Agregar módulo profesional</button></div>`;
 }
 function bindMalla(w, box, rer) {
   w.modulos = w.modulos || [];
@@ -6995,8 +7001,8 @@ document.addEventListener('DOMContentLoaded', init);
 
 </script>
 <script>
-/* ==== pisco.js ==== Portal Web IESTP NASCA 2026 */
-var PISCO_LOGO = "/assets/nasca/logo-cb57ab132d.png";
+/* ==== pisco.js ==== Portal Web IES PALPA 2026 */
+var PISCO_LOGO = "/assets/palpa/footer-logo-cb16952ab8.png";
 (function () {
 'use strict';
 /* =========================================================
@@ -7016,7 +7022,7 @@ function pzEnsure() {
   if (!DB || !DB.config) return;
   const c = DB.config; c.contadores = c.contadores || {};
   ['LR', 'EXP', 'MPV', 'DOC', 'RCL'].forEach(k => { c.contadores[k] = c.contadores[k] || {}; });
-  c.mpv = Object.assign({ horaIni: '08:00', horaFin: '15:40', dias: 'Lunes a viernes', maxMB: 40, maxArchivos: 5, tipos: MPV_TIPOS.slice(), formatos: MPV_FORMATOS.map(f => f[0]), feriados: FERIADOS_2026.slice(), plazos: Object.assign({}, MPV_PLAZOS), correo: 'mesapartes2020@istpnasca.edu.pe', telefono: '056-522681', prefijo: 'MPV-IESTPN' }, c.mpv || {});
+  c.mpv = Object.assign({ horaIni: '13:00', horaFin: '20:00', dias: 'Lunes a viernes', maxMB: 40, maxArchivos: 5, tipos: MPV_TIPOS.slice(), formatos: MPV_FORMATOS.map(f => f[0]), feriados: FERIADOS_2026.slice(), plazos: Object.assign({}, MPV_PLAZOS), correo: 'mesadepartes@istpalpa.edu.pe', telefono: '056-316056', prefijo: 'MPV-IESPALPA' }, c.mpv || {});
   c.lr = Object.assign({}, LR_DEF, c.lr || {});
   c.bolsa = Object.assign({}, BOLSA_DEF, c.bolsa || {});
   Object.assign(EXP_PLAZOS, c.mpv.plazos);
@@ -7099,9 +7105,9 @@ function raster(src, w, h, { bg = '#ffffff', type = 'image/jpeg', fit = 'cover' 
     im.onerror = () => ok(null); if (/^https?:/.test(src)) im.crossOrigin = 'anonymous'; im.src = src;
   });
 }
-const logoPng = () => raster(logoSrc(), 240, 310, { type: 'image/png', fit: 'contain' });
+const logoPng = () => raster(logoSrc(), 240, 310, { type: 'image/png', fit: 'contain', bg: logoSrc().startsWith('/assets/palpa/') ? '#131d3b' : '#ffffff' });
 const hasPdf = () => !!(window.jspdf && window.jspdf.jsPDF);
-const NAVY = [11, 29, 63], BLUE = [10, 127, 194], GOLD = [245, 196, 0], ORANGE = [234, 112, 64], LIGHT = [234, 244, 251];
+const NAVY = [19, 29, 59], BLUE = [28, 51, 91], GOLD = [255, 106, 0], ORANGE = [189, 61, 0], LIGHT = [234, 244, 251];
 function pdfQRp(doc, text, x, y, size) {
   if (!window.qrcode) { doc.setDrawColor(150); doc.rect(x, y, size, size); doc.setFontSize(7); doc.text('QR', x + size / 2, y + size / 2, { align: 'center' }); return; }
   const q = qrcode(0, 'M'); q.addData(text); q.make(); const n = q.getModuleCount(), c = size / n; doc.setFillColor(0, 0, 0);
@@ -7374,7 +7380,7 @@ expDetalle = function (id) {
 };
 function mpvAreasAdm() {
   const as = areasAll();
-  const html = admHead('Mesa de partes virtual', 'Relación de áreas receptoras, responsables y correos institucionales (@istpnasca.edu.pe). Las derivaciones se notifican a estos correos.', can('ix-config') ? `<a class="btn" href="#/admin/ix-config">${sic('edit')} Editar áreas</a>` : '', 'inbox', [['Mesa de partes', '#/admin/expedientes'], ['Áreas receptoras']]) + mpTabs('a')
+  const html = admHead('Mesa de partes virtual', 'Relación de áreas receptoras, responsables y correos configurados por la institución.', can('ix-config') ? `<a class="btn" href="#/admin/ix-config">${sic('edit')} Editar áreas</a>` : '', 'inbox', [['Mesa de partes', '#/admin/expedientes'], ['Áreas receptoras']]) + mpTabs('a')
     + `<div class="panel"><div class="tbl-wrap" style="border:0"><table class="tbl light"><thead><tr><th>Nivel / clasificación</th><th>Código</th><th>Área / cargo / órgano</th><th>Responsable</th><th>Correo corporativo</th><th class="c">Expedientes abiertos</th><th class="c">Estado</th></tr></thead><tbody>${NIVELES.map(n => as.filter(a => (a.nivel || 'Áreas') === n).map((a, i, g) => `<tr>${i === 0 ? `<td rowspan="${g.length}" style="font-weight:700;vertical-align:middle">${esc(n)}</td>` : ''}<td class="mono">${esc(a.cod)}</td><td>${esc(a.nombre)}</td><td>${esc(a.resp)}</td><td><a href="mailto:${esc(a.correo)}">${esc(a.correo)}</a></td><td class="c">${coll('expedientes').filter(x => x.area === a.cod && !['Atendido', 'Archivado'].includes(x.estado)).length}</td><td class="c">${stBadge(a.activo ? 'Activo' : 'Inactivo')}</td></tr>`).join('')).join('')}</tbody></table></div><p class="note" style="padding:0 16px 14px">Las áreas se administran en Configuración académica › Áreas receptoras; los cambios se reflejan en el formulario público y en las derivaciones.</p></div>`;
   return { html };
 }
@@ -7419,7 +7425,7 @@ function lrForm() {
      <div class="field"><label for="l2-nd">Número de documento <span class="req">*</span></label><input id="l2-nd" name="numDoc" maxlength="12" placeholder="Ingrese su documento" autocomplete="off"></div>
      <div class="field"><label for="l2-no">Nombres <span class="req">*</span></label><input id="l2-no" name="nombresP" maxlength="80" placeholder="Ingrese sus nombres" autocomplete="given-name"></div>
      <div class="field"><label for="l2-ap">Apellidos <span class="req">*</span></label><input id="l2-ap" name="apellidos" maxlength="80" placeholder="Ingrese sus apellidos" autocomplete="family-name"></div>
-     <div class="field"><label for="l2-e">Correo electrónico <span class="req">*</span></label><input id="l2-e" name="correo" type="email" maxlength="120" placeholder="mesapartes2020@istpnasca.edu.pe" autocomplete="email"></div>
+     <div class="field"><label for="l2-e">Correo electrónico <span class="req">*</span></label><input id="l2-e" name="correo" type="email" maxlength="120" placeholder="correo@ejemplo.com" autocomplete="email"></div>
      <div class="field"><label for="l2-t">Teléfono</label><input id="l2-t" name="telefono" maxlength="15" inputmode="tel" placeholder="999 999 999" autocomplete="tel"></div>
      <div class="field"><label for="l2-c">Condición del usuario <span class="req">*</span></label><select id="l2-c" name="condicion"><option value="">Seleccione</option>${LR_COND.map(x => `<option>${x}</option>`).join('')}</select></div>
      <div class="field"><label for="l2-p">Programa de estudios</label><select id="l2-p" name="programaId"><option value="">Seleccione</option>${progs().map(p => `<option value="${p.id}">${esc(p.nombre)}</option>`).join('')}<option value="ninguno">No corresponde</option></select></div>
@@ -7730,7 +7736,7 @@ async function readSheet(file) {
   const h = cells(lines[0]); return lines.slice(1).map(l => { const c = cells(l); const o = {}; h.forEach((k, i) => o[k] = c[i] || ''); return o; });
 }
 function padronTemplate() {
-  const rows = [PADRON_COLS, ['70000001', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Egresado', '15/03/2000', 'mesapartes2020@istpnasca.edu.pe', 'Av. Ejemplo 123, Ica', '900000001', 'Arquitectura de Plataformas y Servicios de Tecnologías de Información', '2024', 'Empresa de ejemplo S.A.C.', 'Soporte técnico'], ['70000002', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Por Concluir', '02/08/2004', '', '', '900000002', 'Contabilidad', '', '', '']];
+  const rows = [PADRON_COLS, ['70000001', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Egresado', '15/03/2000', 'mesadepartes@istpalpa.edu.pe', 'Av. Ejemplo 123, Ica', '900000001', 'Arquitectura de Plataformas y Servicios de Tecnologías de Información', '2024', 'Empresa de ejemplo S.A.C.', 'Soporte técnico'], ['70000002', 'APELLIDO APELLIDO, NOMBRES (EJEMPLO)', 'Por Concluir', '02/08/2004', '', '', '900000002', 'Enfermería Técnica', '', '', '']];
   if (window.XLSX) { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(rows); ws['!cols'] = PADRON_COLS.map((c, i) => ({ wch: [10, 38, 14, 14, 26, 30, 12, 50, 12, 28, 18][i] })); XLSX.utils.book_append_sheet(wb, ws, 'Padron'); const ins = XLSX.utils.aoa_to_sheet([['Instrucciones de llenado'], ['DNI: 8 dígitos (obligatorio).'], ['Apellidos y Nombres: obligatorio.'], ['Condición: Egresado, Titulado o Por Concluir (estudiante).'], ['Programa de Estudio: use el nombre o código de un programa institucional registrado. Computación e Informática se reconoce como APSTI.'], ['Fecha de nacimiento: DD/MM/AAAA. Celular: 9 dígitos.'], ['Si el DNI ya existe se actualizan sus datos; si no, se registra.']]); XLSX.utils.book_append_sheet(wb, ins, 'Instrucciones'); downloadBlob(new Blob([XLSX.write(wb, { type: 'array', bookType: 'xlsx' })], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'plantilla_padron_estudiantes_egresados.xlsx'); }
   else downloadText(toCSV(rows), 'plantilla_padron_estudiantes_egresados.csv', 'text/csv');
 }
@@ -8377,7 +8383,7 @@ window.piscoOficial = function (D) {};
 
 
 /* =========================================================
-   DATOS DE DEMOSTRACIÓN 2026 (se cargan al crear la base) e integración final
+   CARGA INSTITUCIONAL 2026 (se cargan al crear la base) e integración final
    ========================================================= */
 window.piscoSeed = function (D) {};
 /* Integración al terminar de cargar la aplicación */

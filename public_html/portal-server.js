@@ -134,7 +134,7 @@ async function portalUpload(file){
 
 const portalOldDocBlob=docBlob;
 // Publicaciones institucionales conservadas localmente; no confundirlas con PDF de ejemplo.
-function portalPublishedDoc(doc){return typeof doc?.url==='string'&&/^\/assets\/(?:nasca|chincha)\/[A-Za-z0-9_-]+\.(pdf|png|jpg|jpeg|webp|docx)$/.test(doc.url);}
+function portalPublishedDoc(doc){return typeof doc?.url==='string'&&/^\/assets\/(?:palpa|nasca|chincha)\/[A-Za-z0-9_-]+\.(pdf|png|jpg|jpeg|webp|docx)$/.test(doc.url);}
 docBlob=function(doc){if(doc?.fileId||portalPublishedDoc(doc)){const xhr=new XMLHttpRequest();xhr.open('GET',doc.url,false);xhr.overrideMimeType('text/plain; charset=x-user-defined');xhr.send();if(xhr.status!==200)throw new Error('No se pudo cargar el archivo.');return new Blob([Uint8Array.from(xhr.responseText,c=>c.charCodeAt(0)&255)],{type:doc.type});}return portalOldDocBlob(doc);};
 const portalOldOpenDoc=openDoc;
 openDoc=function(doc){if(doc?.fileId||portalPublishedDoc(doc)){window.open(doc.url,'_blank','noopener');return;}portalOldOpenDoc(doc);};

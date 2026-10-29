@@ -1,47 +1,49 @@
-# IESTP Nasca — Portal institucional
+# IES Público Palpa — Portal institucional
 
-Sistema PHP/MySQL con contenido del **Instituto de Educación Superior Tecnológico Público “Nasca”**, contrastado con [istpnasca.edu.pe](https://istpnasca.edu.pe/) el **29 de octubre de 2026**.
+Portal PHP/MySQL del **Instituto de Educación Superior Público “Palpa”**, adaptado a la información publicada en [www.istpalpa.edu.pe](https://www.istpalpa.edu.pe/) y consultada el **29 de octubre de 2026**.
 
-Incluye ocho programas: Contabilidad, Enfermería Técnica, Guía Oficial de Turismo, Producción Agropecuaria, Arquitectura de Plataformas y Servicios de Tecnologías de la Información, Electricidad Industrial, Electrónica Industrial y Mecatrónica Automotriz. Conserva las funciones del portal: administración, roles, documentos, trámites, reclamos y módulos académicos.
+Incluye identidad y colores institucionales, presentación de la Dirección, historia, misión y visión, organigrama, 13 cargos jerárquicos y 34 fichas de personal. Oferta cinco programas: Arquitectura de Plataformas y Servicios de Tecnologías de Información, Enfermería Técnica, Guía Oficial de Turismo, Mecatrónica Automotriz y Producción Agropecuaria. Sus fichas contienen perfiles, campo laboral, coordinación y **231 unidades didácticas** organizadas por módulos y semestres.
 
-Se incorporaron identidad, historia, misión y valores, directorios, perfiles de egreso, certificación modular, ocho itinerarios formativos en PDF, admisión y resultados 2026, matrícula 2026-I, 40 tasas del TUPA 2025, 37 beneficiarios de becas 2025-I, estadísticas, documentos de gestión, noticias y servicios. Los 106 recursos originales y dos vistas previas derivadas de sus PDF se sirven desde `public_html/assets/nasca/`.
+Se incorporaron el reglamento de admisión 2026 (135 vacantes), el cronograma de matrícula 2026-II, **32 beneficiarios de becas**, **31 tasas del TUPA 2026**, seis documentos de gestión, indicadores de 2021–2026, dos locales, servicios y la **R.M. N.º 200-2025-MINEDU** de licenciamiento. Los **48 recursos oficiales utilizados** se sirven localmente desde `public_html/assets/palpa/`; sus fuentes y hashes se registran en `portal-private/data/palpa-sources.json`.
 
-**Los periodos publicados no equivalen a procesos abiertos hoy.** Se documentan las discrepancias de las fuentes sin inventar fechas, autoridades, licencias ni información faltante. Las mallas completas se ofrecen como PDF de 2024; no se atribuye vigencia actual ni se inventan unidades, créditos o horas.
+Los procesos publicados no se presentan como inscripciones abiertas. Horas y créditos por unidad, DNI, cuentas bancarias, RUC, código modular, noticias y datos académicos no confirmados no se inventan. Las diferencias entre fuentes se documentan en [MAPEO-PALPA.md](MAPEO-PALPA.md).
 
-- [Fuentes, correspondencia por sección y pendientes](MAPEO-NASCA.md).
-- [Instalación y actualización](INSTRUCCIONES.md).
-- [Manifiesto de páginas y archivos con SHA-256](portal-private/data/nasca-sources.json).
+## Instalación
 
-## Instalación nueva
+Requiere PHP 8.2 o posterior, PDO MySQL, sesiones, Fileinfo, Zlib y MySQL/MariaDB. No necesita Composer ni compilación.
 
-PHP 8.2 o posterior, PDO MySQL, sesiones, Fileinfo, Zlib y MySQL/MariaDB. No requiere Composer ni compilación para el hosting.
+1. Conserva `portal-private/` y `public_html/` al mismo nivel. La raíz pública debe ser `public_html/`.
+2. Copia `portal-private/config.example.php` a `config.php` y configura una base vacía y una `install_key` aleatoria privada de al menos 32 caracteres.
+3. Abre `/install.php` mediante HTTPS y crea tu administrador. La carga inicial no contiene alumnos, usuarios ni expedientes ficticios.
+4. Revisa responsables, permisos y destinatarios de trámites. El correo de Mesa de Partes publicado se usa como contacto central; no representa buzones independientes por oficina. El envío de correos sigue pendiente de habilitación.
+5. Retira los instaladores y recuperadores del hosting cuando ya no sean necesarios. No subas pruebas, evidencias ni credenciales locales.
 
-1. Sube `portal-private/` y `public_html/` al mismo nivel, incluidos los archivos ocultos y todos los recursos de Nasca. No subas pruebas, evidencias ni credenciales locales.
-2. Copia `portal-private/config.example.php` a `config.php`. Configura una base vacía y una `install_key` privada aleatoria de al menos 32 caracteres.
-3. Abre `/install.php` con HTTPS y crea tu administrador. La instalación carga Nasca sin estudiantes, cuentas, empresas ni certificados ficticios.
-4. Configura responsables, permisos y destinatarios operativos. El envío de correo permanece deshabilitado.
-5. Elimina del hosting `install.php`, `actualizar.php` y `recuperar.php` cuando ya no sean necesarios.
+## Instalaciones existentes
 
-## Instalación existente que conserva Chincha
+Subir archivos no reemplaza el contenido guardado en MySQL. Respalda base y archivos, conserva tu configuración y adjuntos, inicia sesión como administrador y abre `/actualizar.php`. Introduce tu clave de instalación y selecciona **«Reemplazar el contenido público actual con la información de Palpa»**.
 
-Subir archivos no cambia el contenido guardado en MySQL. Respalda archivos y base de datos; conserva `config.php` y los adjuntos privados. Tras subir el paquete, inicia sesión como administrador y abre `/actualizar.php`. Introduce tu clave de instalación y marca **«Reemplazar el contenido público de prueba con la información de Nasca»**.
+`PalpaContent.php` crea un respaldo privado, actualiza los catálogos públicos y conserva cuentas, contraseñas, solicitudes y registros académicos. Mantiene los identificadores académicos existentes. Las personas anteriores se conservan fuera de publicación y los programas retirados en borrador, con sus registros académicos inactivos para nuevas operaciones. Revisa tus ediciones institucionales antes de reemplazarlas.
 
-La importación crea un respaldo privado y sustituye el contenido institucional. Conserva cuentas, contraseñas, solicitudes, expedientes, notas y documentos académicos. Las personas y los programas anteriores se mantienen fuera de publicación para preservar sus vínculos e identificadores. No reasigna los IDs académicos de programas ya existentes. Esta sustitución es deliberada: revisa cualquier edición pública propia antes de ejecutarla.
+## Desarrollo y validación
 
-## Validación de desarrollo
+En este entorno: `bash /workspace/nasca-dev/start.sh`. El nombre histórico del helper no cambia la institución del portal. Usa `/workspace/nasca-dev/php` como ejecutable PHP; la configuración local y la base desechable `nasca_test` están vinculadas al contenedor. No imprimir ni versionar sus credenciales.
 
-Solo bases desechables terminadas en `_test` y `PORTAL_CONFIG_FILE` apuntando a `config.test.php`. Las pruebas recrean tablas y modifican datos QA.
+Las pruebas PHP que modifican datos solo aceptan bases terminadas en `_test` y `PORTAL_CONFIG_FILE` terminado en `config.test.php`. Desde el repositorio, en este orden:
 
 ```sh
-node tests/nasca-content.cjs
+node tests/palpa-content.cjs
 php tests/demo-validation.php
 PORTAL_CONFIG_FILE=/ruta/config.test.php php tests/run.php
 PORTAL_CONFIG_FILE=/ruta/config.test.php php tests/parity.php
-PORTAL_CONFIG_FILE=/ruta/config.test.php php tests/nasca-import.php
+PORTAL_CONFIG_FILE=/ruta/config.test.php php tests/palpa-import.php
 PORTAL_CONFIG_FILE=/ruta/config.test.php php tests/functional-fixes.php
-PISCO_BASE_URL=http://127.0.0.1:8083 node tests/browser-nasca.cjs
+PISCO_BASE_URL=http://127.0.0.1:8083 node tests/browser-palpa.cjs
 ```
 
-La prueba web requiere Playwright y Chromium como herramientas externas; no son dependencias del hosting. El servidor debe usar la misma base de pruebas. `demo-content.cjs` se conserva como alias de la validación de Nasca.
+Playwright y Chromium son herramientas externas para las pruebas web; no son dependencias del hosting. En este entorno se usa `NODE_PATH=/workspace/nasca-dev/tools/node_modules`. El servidor local debe usar la misma configuración de pruebas:
 
-Los informes anteriores que nombran Chincha, Pisco o una demostración de Ica, sus evidencias y las pruebas específicas de esos contenidos son históricos; no acreditan validación de Nasca. Los recursos heredados de Chincha se conservan para no romper referencias antiguas, pero no forman parte de la nueva carga institucional.
+```sh
+PORTAL_CONFIG_FILE=/ruta/config.test.php php -S 127.0.0.1:8083 -t public_html
+```
+
+Los informes, recursos y pruebas de Nasca, Chincha y Pisco son antecedentes históricos; no acreditan validación de Palpa. La adaptación no implica despliegue ni publicación del entorno.
