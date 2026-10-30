@@ -394,7 +394,7 @@ final class PortalApp
             $present = array_key_exists($field, $input);
             $value = $input[$field] ?? null;
             if (!$present || $value === null || $value === '') {
-                if (in_array('required', $spec, true)) throw new PortalError(422, 'Completa el campo '.$field.'.');
+                if (in_array('required', $spec, true)) throw new PortalError(422, 'Completa '.PortalRules::label($field).'.');
                 if ($present) $result[$field] = $value;
                 continue;
             }
@@ -411,10 +411,14 @@ final class PortalApp
                     'min', 'max' => true,
                     default => true,
                 };
-                if (!$valid) throw new PortalError(422, 'Revisa el campo '.$field.'.');
+                if (!$valid) throw new PortalError(422, 'Revisa '.PortalRules::label($field).'.');
                 if ($kind === 'min' || $kind === 'max') {
                     $size = in_array('integer', $spec, true) ? (int)$value : (is_array($value) ? count($value) : preg_match_all('/./us', (string)$value));
-                    if (($kind === 'min' && $size < (int)$argument) || ($kind === 'max' && $size > (int)$argument)) throw new PortalError(422, 'El tamaño del campo '.$field.' no es válido.');
+                    if (($kind === 'min' && $size < (int)$argument) || ($kind === 'max' && $size > (int)$argument)) {
+                        $bound = ($kind === 'min' ? 'como mínimo ' : 'como máximo ').$argument;
+                        $unit = in_array('integer', $spec, true) ? 'debe ser '.$bound : (is_array($value) ? 'se permiten '.$bound.' elementos' : 'debe tener '.$bound.' caracteres');
+                        throw new PortalError(422, 'Revisa '.PortalRules::label($field).': '.$unit.'.');
+                    }
                 }
             }
             $result[$field] = in_array('integer', $spec, true) ? (int)$value : $value;

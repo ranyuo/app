@@ -23,7 +23,7 @@ final class PortalDomain
                     $empty=$v===null||$v===''||$v===[];
                     if(($f['required']||($f['publishRequired']&&in_array($r['estado']??'',['Publicado','Publicada','En revisión'],true)))&&$empty&&(!$prior||!empty($prior[$f['name']])))throw new PortalError(422,$key.': completa '.$f['name'].'.');
                     if($empty)continue;
-                    if($f['unique'])foreach($new[$key] as $other)if(!($other['deleted']??false)&&($other['id']??null)!==($r['id']??null)&&isset($other[$f['name']])&&strtolower(trim((string)$other[$f['name']]))===strtolower(trim((string)$v)))throw new PortalError(422,'Valor duplicado en '.$key.'.'.$f['name'].'.');
+                    if($f['unique'])foreach($new[$key] as $other)if(!($other['deleted']??false)&&($other['id']??null)!==($r['id']??null)&&isset($other[$f['name']])&&strtolower(trim((string)$other[$f['name']]))===strtolower(trim((string)$v)))throw new PortalError(422,PortalRules::duplicate($key.'.'.$f['name'],$v));
                     if($f['type']==='date'&&(!is_string($v)||!preg_match('/^\d{4}-\d{2}-\d{2}$/',$v)||($date=DateTimeImmutable::createFromFormat('!Y-m-d',$v))===false||$date->format('Y-m-d')!==$v))throw new PortalError(422,'Fecha no válida en '.$f['name'].'.');
                     if($f['type']==='datetime-local'&&(!is_string($v)||strtotime($v)===false))throw new PortalError(422,'Fecha y hora no válida.');
                     if($f['type']==='image'&&(!$prior||!PortalPolicy::equal($v,$prior[$f['name']]??null))&&!PortalRules::safeImage($v))throw new PortalError(422,'La imagen o su URL no es válida.');
@@ -61,7 +61,10 @@ final class PortalDomain
             self::foreign($a['programas'],$r['prog'],'Programa');$ud=self::foreign($a['uds'],$r['ud'],'Unidad didáctica');
             if($ud['prog']!==$r['prog']||$ud['ciclo']!==$r['ciclo'])throw new PortalError(422,'La unidad didáctica pertenece a otro programa o ciclo.');
             if(!preg_match('/^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/',$r['ini'])||!preg_match('/^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/',$r['fin'])||$r['ini']>=$r['fin'])throw new PortalError(422,'Intervalo de clase no válido.');
-            if(!empty($r['doc']))self::foreign($a['docentes'],$r['doc'],'Docente');if(!empty($r['amb']))self::foreign($a['ambientes'],$r['amb'],'Ambiente');
+            if(!empty($r['doc'])){$teacher=self::foreign($a['docentes'],$r['doc'],'Docente');
+                // La disponibilidad se valida al guardar; los cruces se siguen revisando al publicar, porque el borrador puede tenerlos temporalmente.
+                if(!in_array($r['dia'],$teacher['dias']??[],true)||$r['ini']<($teacher['desde']??'')||$r['fin']>($teacher['hasta']??''))throw new PortalError(422,'La clase está fuera de la disponibilidad del docente.');}
+            if(!empty($r['amb']))self::foreign($a['ambientes'],$r['amb'],'Ambiente');
         }
         foreach($a['publicados'] as $group=>$publication){
             $lessons=array_values(array_filter($a['sesiones'],fn($s)=>self::group($s)===$group));

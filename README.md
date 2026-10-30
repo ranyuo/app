@@ -44,7 +44,7 @@ PORTAL_CONFIG_FILE=/ruta/config.test.php php -S 127.0.0.1:8084 -t public_html
 PISCO_BASE_URL=http://127.0.0.1:8084 node tests/browser-intranet.cjs
 ```
 
-Las pruebas web requieren Playwright y Chromium externos. El servidor debe usar la misma base que la prueba PHP. En este entorno se dispone de los contenedores `app-php` y `app-db`, configuración privada en `/workspace/app-dev/config.test.php`, base `app_test` y Playwright en `/workspace/nasca-dev/tools/node_modules`.
+Las pruebas web requieren Playwright y Chromium externos; `CHROMIUM_PATH` indica el ejecutable (por defecto, `/usr/bin/chromium`). El servidor debe usar la misma base que la prueba PHP. En este entorno se dispone de los contenedores `app-php` y `app-db`, configuración privada en `/workspace/app-dev/config.test.php`, base `app_test` y Playwright en `/workspace/nasca-dev/tools/node_modules`.
 
 ```sh
 docker exec -w /workspace/app app-php php tests/intranet.php
@@ -66,6 +66,6 @@ python3 scripts/package-hostinger.py /ruta/fuera-del-repositorio/intranet-palpa-
 
 El empaquetador incluye solo archivos versionados necesarios para la instalación, los recursos activos de Palpa, las bibliotecas y las instrucciones. Excluye configuraciones privadas, respaldos, pruebas y recursos históricos ajenos a la instalación nueva. Añade versión y hashes de integridad.
 
-Para aplicar las correcciones del QA a una instalación existente, consulta [ACTUALIZACION-QA-HOSTINGER.md](ACTUALIZACION-QA-HOSTINGER.md). El resultado verificado y sus límites están en [QA-CORRECCIONES-INTRANET.md](QA-CORRECCIONES-INTRANET.md).
+Para aplicar las correcciones del QA a una instalación existente, consulta [ACTUALIZACION-QA-HOSTINGER.md](ACTUALIZACION-QA-HOSTINGER.md); para las mejoras posteriores al plan de pruebas, [ACTUALIZACION-MEJORAS.md](ACTUALIZACION-MEJORAS.md). El resultado verificado y sus límites están en [QA-CORRECCIONES-INTRANET.md](QA-CORRECCIONES-INTRANET.md).
 
 La limpieza de archivos y las mediciones de tamaño se documentan en [LIMPIEZA-REPOSITORIO.md](LIMPIEZA-REPOSITORIO.md).

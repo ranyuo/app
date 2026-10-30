@@ -1,7 +1,7 @@
 const{chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const base=process.env.PISCO_BASE_URL||'http://127.0.0.1:8084';assert.ok(['127.0.0.1','localhost'].includes(new URL(base).hostname));
 const PASS='PruebaIntranet-2026!';
-(async()=>{const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let checks=0;const errors=[];const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});page.on('pageerror',e=>errors.push(e.message));await page.route('https://**/*',r=>r.abort());
+(async()=>{const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox']});let checks=0;const errors=[];const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});page.on('pageerror',e=>errors.push(e.message));await page.route('https://**/*',r=>r.abort());
 const shot=path.join(__dirname,'.results/intranet');fs.mkdirSync(shot,{recursive:true});
 const go=async route=>{await page.goto(base+'/#/'+route,{waitUntil:'domcontentloaded'});await page.locator('main').waitFor();assert.doesNotMatch(await page.locator('main').innerText(),/Ocurrió un error|TypeError|ReferenceError/);};
 const login=async name=>{await go('admin');await page.fill('#lg-u',name);await page.fill('#lg-p',PASS);await page.locator('[data-login] button[type=submit]').click();await page.waitForURL('**/#/admin/dashboard');await page.locator('.intra-welcome').waitFor();};
