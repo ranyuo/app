@@ -38,8 +38,8 @@ Fuente principal: https://www.istpalpa.edu.pe/. Consulta: **29/10/2026**. Manifi
 - **Información ausente:** RUC, código modular, banco/cuenta de pago, costos de servicios, noticias y reconocimientos no se completan con información de otro instituto. Las inversiones se describen como texto porque no se publican importes ni fechas completas.
 - El recurso exploratorio `css/skin-color.css` devolvió 404; no se usa ni se enlaza. Las imágenes oficiales blancas del logotipo se mantienen sin alteración y se presentan sobre azul para asegurar contraste.
 
-## Actualización y conservación
+## Uso en la intranet actual
 
-La instalación nueva carga Palpa desde `portal.json`. En una base existente, `PalpaContent::apply` requiere administrador, crea un respaldo privado y reemplaza catálogos públicos y la identidad. Conserva usuarios, contraseñas, solicitudes, archivos privados, matrículas, notas y demás registros operativos. Mantiene los IDs académicos y no ofrece de nuevo programas retirados. La interfaz de `/actualizar.php` requiere selección explícita y clave privada.
+La instalación nueva carga los datos de Palpa desde `portal-private/data/portal.json`. La intranet administra únicamente los módulos complementarios; no importa ni reemplaza el contenido de la web institucional. Las instalaciones existentes conservan sus cuentas, registros, configuración y adjuntos al actualizar archivos.
 
-Los activos e informes de Nasca y Chincha quedan como antecedentes, fuera de la nueva carga. No se ha desplegado al hosting ni publicado el entorno como parte de esta adaptación.
+El importador del portal completo, los activos de Nasca y Chincha y sus informes se retiraron de la versión actual. El historial de Git conserva las versiones anteriores. Se mantienen este documento y `portal-private/data/palpa-sources.json` como trazabilidad de los datos de Palpa.

@@ -6,3 +6,11 @@
 /portal-private/*.lock
 /portal-private/*.log
 /tests/.results/
+
+# Evidencias y paquetes generados: conservar fuera del código fuente.
+/docs/qa/
+/evidencias/
+/entregables/
+# Recursos retirados de otros institutos.
+/public_html/assets/chincha/
+/public_html/assets/nasca/

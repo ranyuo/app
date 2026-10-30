@@ -54,7 +54,7 @@ NODE_PATH=/workspace/nasca-dev/tools/node_modules PISCO_BASE_URL=http://127.0.0.
 docker exec -w /workspace/app app-php php tests/inactive-routing.php
 ```
 
-Los informes y suites anteriores de portal completo, Nasca, Chincha o Pisco son históricos y no constituyen la verificación de esta intranet. Las pruebas actuales evalúan el alcance reducido, los permisos y los recorridos conservados. El correo saliente y la carga de información académica real siguen pendientes de configuración institucional.
+Se retiraron los informes, paquetes y suites históricas del portal completo; se conservan las cinco pruebas vigentes de esta intranet. Las pruebas actuales evalúan el alcance reducido, los permisos y los recorridos conservados. El correo saliente y la carga de información académica real siguen pendientes de configuración institucional.
 
 ## Paquete para Hostinger
 
@@ -67,3 +67,5 @@ python3 scripts/package-hostinger.py /ruta/fuera-del-repositorio/intranet-palpa-
 El empaquetador incluye solo archivos versionados necesarios para la instalación, los recursos activos de Palpa, las bibliotecas y las instrucciones. Excluye configuraciones privadas, respaldos, pruebas y recursos históricos ajenos a la instalación nueva. Añade versión y hashes de integridad.
 
 Para aplicar las correcciones del QA a una instalación existente, consulta [ACTUALIZACION-QA-HOSTINGER.md](ACTUALIZACION-QA-HOSTINGER.md). El resultado verificado y sus límites están en [QA-CORRECCIONES-INTRANET.md](QA-CORRECCIONES-INTRANET.md).
+
+La limpieza de archivos y las mediciones de tamaño se documentan en [LIMPIEZA-REPOSITORIO.md](LIMPIEZA-REPOSITORIO.md).
