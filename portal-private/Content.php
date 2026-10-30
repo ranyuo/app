@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/** Correcciones conocidas de Chincha; conserva el resto del catálogo y los datos operativos. */
+/** Compatibilidad de catálogos; conserva identificadores y registros operativos. */
 final class PortalContent
 {
     public static function forJson(array $payload): array
@@ -14,6 +14,9 @@ final class PortalContent
 
     public static function normalize(array $data): array
     {
+        foreach ($data['academico']['areas'] ?? [] as $i => $area) {
+            $data['academico']['areas'][$i]['nivel'] = self::areaLevel($area);
+        }
         foreach ($data['tupa'] ?? [] as $i => $row) {
             $categories = ['6.- CONSTANCIA Y CERTIFICADOS' => '6.- CONSTANCIAS Y CERTIFICADOS',
                 '12.-ALQUILERES' => '12.- ALQUILERES'];
@@ -29,5 +32,21 @@ final class PortalContent
             }
         }
         return $data;
+    }
+
+    public static function areaLevel(array $area): string
+    {
+        $level = trim((string)($area['nivel'] ?? ''));
+        return match ($level) {
+            'Oficina' => match ($area['cod'] ?? '') {
+                'MP' => 'Mesa de Partes',
+                'DG' => 'Dirección',
+                default => 'Áreas',
+            },
+            '', 'Área' => 'Áreas',
+            'Unidad' => 'Unidades',
+            'Programa' => 'Coordinaciones de programas de estudio',
+            default => $level,
+        };
     }
 }

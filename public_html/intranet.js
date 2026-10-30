@@ -48,7 +48,7 @@ CUSTOM.dashboard=function(){
 CUSTOM.config=()=>singletonForm({title:'Configuración de la intranet',icon:'gear',sub:'Identidad de la aplicación y contacto para los servicios complementarios.',
  get:()=>({nombre:inst().nombre,nombreCorto:inst().nombreCorto,telefono:inst().telefono,correo:inst().correo,direccion:inst().direccion,horario:inst().horario,correoReclamos:DB.config.correoReclamos||''}),
  fields:[{n:'nombre',l:'Nombre de la institución',req:true,full:true},{n:'nombreCorto',l:'Nombre corto',req:true},{n:'telefono',l:'Teléfono'},{n:'correo',l:'Correo de contacto',t:'email',req:true},{n:'direccion',l:'Dirección',full:true},{n:'horario',l:'Horario de atención',full:true},{n:'correoReclamos',l:'Correo responsable de reclamos',t:'email'}],
- onSave:(w)=>{for(const key of ['nombre','nombreCorto','telefono','correo','direccion','horario'])DB.config.inst[key]=w[key];DB.config.correoReclamos=w.correoReclamos;}
+ onSave:(w)=>{for(const key of ['nombre','nombreCorto','telefono','correo','direccion','horario'])DB.config.inst[key]=w[key];DB.config.correoReclamos=w.correoReclamos;DB.config.lr=DB.config.lr||{};DB.config.lr.correo=w.correoReclamos;}
 });
 // El catálogo de programas es soporte académico, sin perfiles promocionales ni brochures del sitio.
 SPECS.programas.sub='Programas, duración y organización curricular para los módulos académicos.';

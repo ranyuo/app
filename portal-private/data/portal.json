@@ -268,7 +268,7 @@
       "plazoQueja": 15,
       "alerta": 3,
       "areaInicial": "ADM",
-      "flujo": "El reclamo o queja se registra en el Libro de Reclamaciones Virtual y se notifica al responsable institucional. El responsable lo deriva al área competente, que lo atiende y propone la respuesta. El responsable remite la respuesta al usuario por correo electrónico dentro del plazo. Todo el recorrido queda en el historial."
+      "flujo": "El reclamo o queja se registra en el Libro de Reclamaciones Virtual. El responsable institucional lo deriva al área competente, registra la respuesta y la deja disponible en la consulta de seguimiento. Todo el recorrido queda en el historial."
     },
     "bolsa": {
       "responsable": "",
@@ -5939,7 +5939,7 @@
       {
         "id": 1,
         "cod": "MP",
-        "nivel": "Oficina",
+        "nivel": "Mesa de Partes",
         "nombre": "Mesa de Partes",
         "resp": "Confirmar responsable con la institución",
         "correo": "mesadepartes@istpalpa.edu.pe",
@@ -5948,7 +5948,7 @@
       {
         "id": 2,
         "cod": "DG",
-        "nivel": "Oficina",
+        "nivel": "Dirección",
         "nombre": "Dirección General",
         "resp": "Daniel Alberto Germán Salas Miranda",
         "correo": "mesadepartes@istpalpa.edu.pe",
@@ -5957,7 +5957,7 @@
       {
         "id": 3,
         "cod": "ADM",
-        "nivel": "Oficina",
+        "nivel": "Áreas",
         "nombre": "Unidad Administrativa",
         "resp": "Martha Elva Uribe Arana",
         "correo": "mesadepartes@istpalpa.edu.pe",
@@ -5966,7 +5966,7 @@
       {
         "id": 4,
         "cod": "UA",
-        "nivel": "Oficina",
+        "nivel": "Áreas",
         "nombre": "Unidad Académica",
         "resp": "Jorge Walter Donayre Donayre",
         "correo": "mesadepartes@istpalpa.edu.pe",
@@ -5975,7 +5975,7 @@
       {
         "id": 5,
         "cod": "SA",
-        "nivel": "Oficina",
+        "nivel": "Áreas",
         "nombre": "Secretaría Académica",
         "resp": "Juan José Donayre Carpio",
         "correo": "mesadepartes@istpalpa.edu.pe",
@@ -5984,7 +5984,7 @@
       {
         "id": 6,
         "cod": "UBE",
-        "nivel": "Oficina",
+        "nivel": "Áreas",
         "nombre": "Bienestar y Empleabilidad",
         "resp": "Juan Carlos Medina Moquillaza",
         "correo": "mesadepartes@istpalpa.edu.pe",
@@ -5993,7 +5993,7 @@
       {
         "id": 7,
         "cod": "UI",
-        "nivel": "Oficina",
+        "nivel": "Áreas",
         "nombre": "Investigación",
         "resp": "Pilar Aurora Pérez Torrealva",
         "correo": "mesadepartes@istpalpa.edu.pe",
@@ -6002,7 +6002,7 @@
       {
         "id": 8,
         "cod": "UFC",
-        "nivel": "Oficina",
+        "nivel": "Áreas",
         "nombre": "Formación Continua",
         "resp": "Karina Elizabeth Gutiérrez Tipiana",
         "correo": "mesadepartes@istpalpa.edu.pe",
@@ -6011,7 +6011,7 @@
       {
         "id": 9,
         "cod": "CAL",
-        "nivel": "Oficina",
+        "nivel": "Áreas",
         "nombre": "Calidad",
         "resp": "Carmen Carolina Carrera Guerrero",
         "correo": "mesadepartes@istpalpa.edu.pe",

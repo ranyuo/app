@@ -2752,10 +2752,10 @@ ENT.titulos = { col:"titulos", one:"título", title:"Registro institucional de t
   sort:(a,b) => b.tit.localeCompare(a.tit),
   label:r => r.cod };
 
-ENT.areas = { col:"areas", one:"área", title:"Áreas o unidades receptoras", mod:"Mesa de partes", permMod:"mesa",
+ENT.areas = { col:"areas", one:"área", title:"Áreas o unidades receptoras", mod:"Mesa de partes", permMod:"config",
   fields:() => [
     {k:"cod",l:"Código",req:true,uniq:true,upper:true},
-    {k:"nivel",l:"Nivel / clasificación",t:"select",req:true,opts:() => ["Mesa de Partes","Dirección","Órganos y comités","Áreas","Unidades","Coordinaciones de programas de estudio"].map(x => [x,x])},
+    {k:"nivel",l:"Nivel / clasificación",t:"select",req:true,opts:() => HOST.areaLevels(DB.areas).map(x => [x,x])},
     {k:"nombre",l:"Nombre del área",req:true,w:1},
     {k:"resp",l:"Responsable asignado (cargo y/o nombre)",req:true},
     {k:"correo",l:"Correo institucional",t:"email",req:true,pat:PAT_MAIL},
@@ -2764,7 +2764,7 @@ ENT.areas = { col:"areas", one:"área", title:"Áreas o unidades receptoras", mo
   label:r => r.cod,
   refs:r => { const n = cnt(DB.tramites,t => t.area === r.cod) + cnt(HOST.exps(),e => e.area === r.cod); return n ? `El área ${r.nombre} tiene ${n} trámite(s) o expediente(s) asociados. Puede desactivarla.` : "" } };
 
-ENT.tramites = { col:"tramites", one:"tipo de trámite", title:"Tipos de trámite", mod:"Mesa de partes", permMod:"mesa",
+ENT.tramites = { col:"tramites", one:"tipo de trámite", title:"Tipos de trámite", mod:"Mesa de partes", permMod:"config",
   fields:() => [
     {k:"nombre",l:"Nombre del trámite",req:true,uniq:true,w:1},
     {k:"area",l:"Área responsable",t:"select",req:true,opts:() => DB.areas.filter(a => a.activo).map(a => [a.cod, a.nombre])},
@@ -3727,9 +3727,11 @@ V.bitacora = () => {
 
 /* ---------- configuración ---------- */
 V.config = () => {
-  const T = tabs("config", [["periodo","Periodo académico"],["documentos","Constancias y reportes"]]);
-  const intro = head("Configuración","Configuración académica","Periodo académico vigente y formato de las constancias, horarios y reportes que emite el sistema.") + T.html;
+  const T = tabs("config", [["periodo","Periodo académico"],["documentos","Constancias y reportes"],["areas","Áreas receptoras"],["tramites","Tipos de trámite"]]);
+  const intro = head("Configuración","Configuración académica","Periodo académico, formatos de documentos y catálogos de áreas receptoras y trámites.") + T.html;
   if(T.cur === "documentos") return intro + docsConfig();
+  if(T.cur === "areas") return intro + crud("areas");
+  if(T.cur === "tramites") return intro + crud("tramites");
   return intro + `<section class="panel"><h2>Periodo académico vigente</h2><p class="note">Los datos institucionales (nombre, dirección, director) se toman de la Configuración del portal.</p><form class="f" data-form="cfg" novalidate>${fieldHtml({k:"periodo",l:"Periodo académico vigente",req:true,pat:PAT_PER,hint:"Los horarios se programan y validan sobre este periodo."}, DB.cfg.periodo)}<div class="fld"><button class="btn" type="submit">Guardar</button></div></form></section>`;
 };
 
@@ -6865,8 +6867,16 @@ const isCommunity = () => !!role().community;
 function ixStyle() { const h = v => /^#[0-9a-f]{6}$/i.test(v || ''); const b = h(TC.blue) ? TC.blue : '#1556b8', g = h(TC.gold) ? TC.gold : '#f2b705', n = h(TC.navy) ? TC.navy : '#0a2a5e'; const lum = parseInt(b.slice(1, 3), 16) * .299 + parseInt(b.slice(3, 5), 16) * .587 + parseInt(b.slice(5, 7), 16) * .114; return `--c-brand:${b};--c-brand-ink:${lum > 150 ? '#111' : '#fff'};--c-acc:${g};--c-side:${n}`; }
 function ixWrap(inner) { const l = document.getElementById('ix-layer'); if (l) l.setAttribute('style', ixStyle()); return `<div class="ix ix-page" id="ix-root" data-palette="web" style="${ixStyle()}">${inner}</div>`; }
 const businessDaysLeft = (fromISO, days) => { const d = new Date(String(fromISO).slice(0, 10) + 'T12:00:00'); let k = 0; while (k < days) { d.setDate(d.getDate() + 1); if (![0, 6].includes(d.getDay())) k++; } const t = new Date(); t.setHours(12, 0, 0, 0); let n = 0; const s = t <= d ? 1 : -1; const c = new Date(t); while (c.toDateString() !== d.toDateString()) { c.setDate(c.getDate() + s); if (![0, 6].includes(c.getDay())) n += s; } return { due: d, left: n }; };
+const AREA_LEVELS = ['Mesa de Partes', 'Dirección', 'Órganos y comités', 'Áreas', 'Unidades', 'Coordinaciones de programas de estudio'];
+function areaLevel(area) {
+  const level = String(area.nivel || '').trim();
+  if (level === 'Oficina') return area.cod === 'MP' ? 'Mesa de Partes' : area.cod === 'DG' ? 'Dirección' : 'Áreas';
+  return new Map([['', 'Áreas'], ['Área', 'Áreas'], ['Unidad', 'Unidades'], ['Programa', 'Coordinaciones de programas de estudio']]).get(level) || level;
+}
+function areaLevels(areas) { return [...new Set([...AREA_LEVELS, ...areas.map(areaLevel)])]; }
 const IXHOST = {
   loadAcad: () => DB.academico || null,
+  areaLevels: areas => areaLevels(areas),
   saveAcad: a => { DB.academico = a; return saveDB(); },
   openBackups: () => {location.href='/respaldos.php';},
   toast: m => toast(m),
@@ -7015,8 +7025,8 @@ const MPV_PLAZOS = { 'Solicitud': 10, 'Oficio': 7, 'Carta': 7, 'Informe': 7, 'Me
 const MPV_FORMATOS = [['pdf', 'PDF'], ['doc', 'DOC'], ['docx', 'DOCX'], ['xls', 'XLS'], ['xlsx', 'XLSX'], ['jpg', 'JPG'], ['jpeg', 'JPEG'], ['png', 'PNG']];
 const MIME_OK = { pdf: ['application/pdf'], doc: ['application/msword'], docx: ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'], xls: ['application/vnd.ms-excel'], xlsx: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'], jpg: ['image/jpeg'], jpeg: ['image/jpeg'], png: ['image/png'] };
 const FERIADOS_2026 = ['2026-01-01', '2026-04-02', '2026-04-03', '2026-05-01', '2026-06-07', '2026-06-29', '2026-07-23', '2026-07-28', '2026-07-29', '2026-08-06', '2026-08-30', '2026-10-08', '2026-11-01', '2026-12-08', '2026-12-09', '2026-12-25'];
-const LR_DEF = { responsable: 'Responsable de Administración', cargo: 'Jefa de Área de Administración', correo: '', plazoReclamo: 15, plazoQueja: 15, alerta: 3, areaInicial: 'ADM',
-  flujo: 'El reclamo o queja se registra en el Libro de Reclamaciones Virtual y se notifica al responsable institucional. El responsable lo deriva al área competente, que lo atiende y propone la respuesta. El responsable remite la respuesta al usuario por correo electrónico dentro del plazo. Todo el recorrido queda en el historial.' };
+const LR_DEF = { responsable: '', cargo: '', correo: '', plazoReclamo: 15, plazoQueja: 15, alerta: 3, areaInicial: 'ADM',
+  flujo: 'El reclamo o queja se registra en el Libro de Reclamaciones Virtual. El responsable institucional lo deriva al área competente, registra la respuesta y la deja disponible en la consulta de seguimiento. Todo el recorrido queda en el historial.' };
 const BOLSA_DEF = { responsable: 'Unidad de Bienestar y Empleabilidad', jefe: 'Jefe(a) de la Unidad de Bienestar y Empleabilidad', correo: '',
   criterios: ['RUC de 11 dígitos válido (dígito verificador), en estado ACTIVO y condición HABIDO en SUNAT.', 'Razón social, sector económico y dirección fiscal coincidentes con la ficha RUC.', 'Persona de contacto con cargo y correo corporativo o institucional verificable.', 'Actividad económica lícita y vinculada a los programas de estudio del instituto.', 'Las convocatorias deben indicar puesto, requisitos, modalidad y fecha límite; no se aceptan cobros a postulantes.', 'Plazo de evaluación: hasta 3 días hábiles desde el registro.'] };
 
@@ -7072,10 +7082,9 @@ const lrSem = r => { if (r.anulado || r.estado === 'Atendido') return '<span cla
 /* ---------- Áreas receptoras (catálogo único del módulo académico) ---------- */
 const areasAll = () => (IX && IX.areasFull ? IX.areasFull() : []);
 const areaOf = cod => areasAll().find(a => a.cod === cod) || null;
-const NIVELES = ['Mesa de Partes', 'Dirección', 'Órganos y comités', 'Áreas', 'Unidades', 'Coordinaciones de programas de estudio'];
 function areaOptions(sel, { skipMP = false, placeholder = 'Seleccione el área de destino' } = {}) {
   const as = areasAll().filter(a => a.activo && !(skipMP && a.cod === 'MP'));
-  return `<option value="">${esc(placeholder)}</option>` + NIVELES.map(n => { const g = as.filter(a => (a.nivel || 'Áreas') === n); return g.length ? `<optgroup label="${esc(n)}">${g.map(a => `<option value="${esc(a.cod)}" ${a.cod === sel ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</optgroup>` : ''; }).join('');
+  return `<option value="">${esc(placeholder)}</option>` + areaLevels(as).map(n => { const g = as.filter(a => areaLevel(a) === n); return g.length ? `<optgroup label="${esc(n)}">${g.map(a => `<option value="${esc(a.cod)}" ${a.cod === sel ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</optgroup>` : ''; }).join('');
 }
 
 /* ---------- Archivos compartidos en el servidor ---------- */
@@ -7383,7 +7392,7 @@ expDetalle = function (id) {
 function mpvAreasAdm() {
   const as = areasAll();
   const html = admHead('Mesa de partes virtual', 'Relación de áreas receptoras, responsables y correos configurados por la institución.', can('ix-config') ? `<a class="btn" href="#/admin/ix-config">${sic('edit')} Editar áreas</a>` : '', 'inbox', [['Mesa de partes', '#/admin/expedientes'], ['Áreas receptoras']]) + mpTabs('a')
-    + `<div class="panel"><div class="tbl-wrap" style="border:0"><table class="tbl light"><thead><tr><th>Nivel / clasificación</th><th>Código</th><th>Área / cargo / órgano</th><th>Responsable</th><th>Correo corporativo</th><th class="c">Expedientes abiertos</th><th class="c">Estado</th></tr></thead><tbody>${NIVELES.map(n => as.filter(a => (a.nivel || 'Áreas') === n).map((a, i, g) => `<tr>${i === 0 ? `<td rowspan="${g.length}" style="font-weight:700;vertical-align:middle">${esc(n)}</td>` : ''}<td class="mono">${esc(a.cod)}</td><td>${esc(a.nombre)}</td><td>${esc(a.resp)}</td><td><a href="mailto:${esc(a.correo)}">${esc(a.correo)}</a></td><td class="c">${coll('expedientes').filter(x => x.area === a.cod && !['Atendido', 'Archivado'].includes(x.estado)).length}</td><td class="c">${stBadge(a.activo ? 'Activo' : 'Inactivo')}</td></tr>`).join('')).join('')}</tbody></table></div><p class="note" style="padding:0 16px 14px">Las áreas se administran en Configuración académica › Áreas receptoras; los cambios se reflejan en el formulario público y en las derivaciones.</p></div>`;
+    + `<div class="panel"><div class="tbl-wrap" style="border:0"><table class="tbl light"><thead><tr><th>Nivel / clasificación</th><th>Código</th><th>Área / cargo / órgano</th><th>Responsable</th><th>Correo corporativo</th><th class="c">Expedientes abiertos</th><th class="c">Estado</th></tr></thead><tbody>${areaLevels(as).map(n => as.filter(a => areaLevel(a) === n).map((a, i, g) => `<tr>${i === 0 ? `<td rowspan="${g.length}" style="font-weight:700;vertical-align:middle">${esc(n)}</td>` : ''}<td class="mono">${esc(a.cod)}</td><td>${esc(a.nombre)}</td><td>${esc(a.resp)}</td><td><a href="mailto:${esc(a.correo)}">${esc(a.correo)}</a></td><td class="c">${coll('expedientes').filter(x => x.area === a.cod && !['Atendido', 'Archivado'].includes(x.estado)).length}</td><td class="c">${stBadge(a.activo ? 'Activo' : 'Inactivo')}</td></tr>`).join('')).join('')}</tbody></table></div><p class="note" style="padding:0 16px 14px">Las áreas se administran en Configuración académica › Áreas receptoras; los cambios se reflejan en el formulario público y en las derivaciones.</p></div>`;
   return { html };
 }
 function mpvConfigAdm() {
@@ -7451,6 +7460,8 @@ function lrForm() {
 }
 function lrPage(path, q0) {
   const c = lrCfg(); const i = inst(); const t0 = q0 && q0.get && q0.get('tab'); const cur = t0 === 'consulta' || (q0 && q0.get && q0.get('rcl')) ? 'c' : t0 === 'info' ? 'i' : 'r';
+  const contact = c.correo || DB.config.correoReclamos || i.correo || '';
+  const contactHTML = contact ? `<a href="mailto:${esc(contact)}">${esc(contact)}</a>${!c.correo ? '<br><small>Contacto institucional</small>' : ''}` : '<span>Contacta al instituto por teléfono.</span>';
   const body = `${svNav('libro-de-reclamaciones')}${svHead('lr', [['clock', `Reclamos: ${c.plazoReclamo} días hábiles`], ['clock', `Quejas: ${c.plazoQueja} días hábiles`], ['file', 'Constancia en PDF']])}
    ${svSteps([['Registra', 'Elige reclamo o queja y describe lo sucedido.'], ['Recibe tus códigos', 'Seguimiento RCL, verificación y constancia PDF con QR.'], ['Atención', 'El responsable lo deriva al área competente.'], ['Respuesta', 'Consulta la respuesta en el portal dentro del plazo.']])}
    ${svTabs([['r', 'edit', 'Registrar reclamo o queja'], ['c', 'search', 'Consultar estado'], ['i', 'book', 'Información']], cur)}
@@ -7459,12 +7470,12 @@ function lrPage(path, q0) {
    <div data-pane="i" ${cur === 'i' ? '' : 'hidden'}><section class="card cb pz-lr-inf">
      <div class="pz-lr-2"><div class="rec">${sic('file', 22)}<b>Reclamo</b><p>Disconformidad relacionada con el servicio educativo o con los trámites brindados por el instituto.</p><small>Plazo de respuesta: ${c.plazoReclamo} días hábiles</small></div><div class="que">${sic('alert', 22)}<b>Queja</b><p>Malestar o descontento respecto a la atención recibida: trato, demora, falta de información, etc.</p><small>Plazo de respuesta: ${c.plazoQueja} días hábiles</small></div></div>
      <h3>Flujo de atención</h3><ol class="pz-flow"><li><b>Recibido</b><span>Registro y constancia PDF descargable.</span></li><li><b>Derivado</b><span>El responsable lo deriva al área competente.</span></li><li><b>En atención</b><span>El área evalúa y propone la respuesta.</span></li><li><b>Atendido</b><span>La respuesta queda disponible en el seguimiento del portal.</span></li></ol>
-     <h3>Responsable de la atención</h3><p><b>${esc(c.responsable || 'Responsable pendiente de asignación')}</b> · ${esc(c.cargo)}<br><a href="mailto:${esc(c.correo)}">${esc(c.correo)}</a></p>
+     <h3>Responsable de la atención</h3><p><b>${esc(c.responsable || 'Responsable pendiente de asignación')}</b> · ${esc(c.cargo)}<br>${contactHTML}</p>
      <h3>A tener en cuenta</h3><ul><li>El plazo se cuenta desde el día hábil siguiente al registro.</li><li>La formulación del reclamo no impide acudir a otras vías de solución de controversias.</li><li>Base normativa: Decreto Supremo N.º 042-2011-PCM, que obliga a las entidades públicas a contar con un Libro de Reclamaciones.</li></ul></section></div>
    <div class="pz-info3"><div>${ic('shield')}<b>Registro seguro</b><span>Tu información se registra de manera segura y protegida (Ley N.º 29733).</span></div><div>${ic('search')}<b>Seguimiento</b><span>Con tu código consultas el estado en cualquier momento.</span></div><div>${ic('mail')}<b>Notificación</b><span>Consulta el estado y la respuesta con tu código de seguimiento.</span></div></div>`;
-  const side = `<section class="side-box"><h2>Responsable de la atención</h2><div class="pad" style="font-size:13.5px"><b>${esc(c.responsable || 'Responsable pendiente de asignación')}</b><br>${esc(c.cargo)}<br>✉️ <a href="mailto:${esc(c.correo)}">${esc(c.correo)}</a></div></section>
+  const side = `<section class="side-box"><h2>Responsable de la atención</h2><div class="pad" style="font-size:13.5px"><b>${esc(c.responsable || 'Responsable pendiente de asignación')}</b><br>${esc(c.cargo)}<br>✉️ ${contactHTML}</div></section>
    <section class="side-box"><h2>Plazos de respuesta</h2><div class="pad" style="font-size:13.5px"><ul style="padding-left:18px;margin:0"><li>Reclamos: hasta <b>${c.plazoReclamo} días hábiles</b>.</li><li>Quejas: hasta <b>${c.plazoQueja} días hábiles</b>.</li></ul></div></section>
-   <section class="side-box"><h2>¿Necesitas ayuda?</h2><div class="pad" style="font-size:13.5px">📞 ${esc(i.telefono)}<br>✉️ ${esc(c.correo)}<br>🕗 ${esc(i.horario)}</div></section>`;
+   <section class="side-box"><h2>¿Necesitas ayuda?</h2><div class="pad" style="font-size:13.5px">📞 ${esc(i.telefono)}<br>✉️ ${contactHTML}<br>🕗 ${esc(i.horario)}</div></section>`;
   const html = shell(path, { title: 'Libro de Reclamaciones', desc: `Libro de Reclamaciones Virtual del ${inst().nombre}: registra tu reclamo o queja y consulta su estado.`, crumbs: [['Servicios', '#/servicios'], ['Libro de Reclamaciones']], banner: { kicker: 'Servicios en línea', title: 'Libro de Reclamaciones', text: 'Porque un mejor servicio también se construye escuchándote' }, side, body });
   return { html, after: () => bindLr2(q0) };
 }
@@ -7589,7 +7600,7 @@ reclamoDetalle = function (id) {
   const out = baseReclamoDet(id); const r = byId('reclamos', id); if (!r) return out; const c = lrCfg(); const p = lrPlazo(r);
   const extra = `<div class="panel"><h2>Plazo y derivación</h2><div class="pb" style="display:grid;gap:10px"><div class="meta-list"><span>Responsable: <b>${esc((r.responsable || {}).nombre || c.responsable)}</b> (${esc((r.responsable || {}).cargo || c.cargo)})</span><span>Plazo: ${lrPlazoDias(r)} días hábiles · vence <b>${fdate(p.due)}</b></span><span>${lrSem(r)}</span>${r.area ? `<span>Área que atiende: <b>${esc(areaName(r.area))}</b></span>` : ''}</div>
     ${r.condicion ? `<dl class="kv"><dt>Condición</dt><dd>${esc(r.condicion)}</dd><dt>Programa</dt><dd>${esc((progById(r.programaId) || {}).nombre || '—')}</dd><dt>Fecha del hecho</dt><dd>${r.fechaHecho ? fshort(r.fechaHecho + 'T12:00:00') : '—'}</dd><dt>Área involucrada</dt><dd>${r.areaHecho ? esc(areaName(r.areaHecho)) : '—'}</dd></dl>` : ''}
-    ${r.anulado || r.estado === 'Atendido' ? '' : `<div class="field"><label for="lr-ar">Derivar al área competente</label><select id="lr-ar">${areaOptions(r.area || r.areaHecho || '', { placeholder: 'Seleccione el área' })}</select></div><div class="field"><label for="lr-arn">Indicación para el área</label><input id="lr-arn" class="inp" placeholder="Ej.: Atender y remitir informe en 5 días hábiles"></div><button class="btn sec" data-der>${sic('send')} Derivar y notificar</button>`}
+    ${r.anulado || r.estado === 'Atendido' ? '' : `<div class="field"><label for="lr-ar">Derivar al área competente</label><select id="lr-ar">${areaOptions(r.area || r.areaHecho || '', { placeholder: 'Seleccione el área' })}</select></div><div class="field"><label for="lr-arn">Indicación para el área</label><input id="lr-arn" class="inp" placeholder="Ej.: Atender y remitir informe en 5 días hábiles"></div><button class="btn sec" data-der>${sic('send')} Derivar reclamo</button>`}
     ${r.adjunto && r.adjunto.key ? `<button class="btn ghost sm" data-adj2>${sic('download')} Descargar evidencia</button>` : ''}</div></div>`;
   out.html = out.html.replace('<div style="display:grid;gap:16px;align-content:start"><div class="panel"><h2>Gestión</h2>', '<div style="display:grid;gap:16px;align-content:start">' + extra + '<div class="panel"><h2>Gestión</h2>');
   const a0 = out.after;
@@ -7616,9 +7627,9 @@ function lrConfigAdm() {
       <div class="field"><label for="lc-pq">Plazo de respuesta a quejas (días hábiles)</label><input id="lc-pq" name="plazoQueja" type="number" min="1" max="30" value="${c.plazoQueja}"></div>
       <div class="field"><label for="lc-al">Alertar cuando falten (días hábiles)</label><input id="lc-al" name="alerta" type="number" min="1" max="10" value="${c.alerta}"></div>
       <div class="field full"><label for="lc-f">Flujo de derivación interna (texto informativo)</label><textarea id="lc-f" name="flujo" rows="4">${esc(c.flujo)}</textarea></div>
-      <div class="full"><ol class="pz-flow h"><li><b>Recibido</b><span>Registro, código RCL y constancia.</span></li><li><b>Derivado</b><span>El responsable lo deriva al área competente.</span></li><li><b>En atención</b><span>El área evalúa y propone la respuesta.</span></li><li><b>Atendido</b><span>Respuesta notificada al usuario.</span></li></ol></div>
+      <div class="full"><ol class="pz-flow h"><li><b>Recibido</b><span>Registro, código RCL y constancia.</span></li><li><b>Derivado</b><span>El responsable lo deriva al área competente.</span></li><li><b>En atención</b><span>El área evalúa y propone la respuesta.</span></li><li><b>Atendido</b><span>Respuesta disponible en la consulta de seguimiento.</span></li></ol></div>
       <div class="full" style="text-align:right">${canEdit ? '<button class="btn">Guardar</button>' : '<span class="note">Solo el administrador puede modificar esta configuración.</span>'}</div></div></div></form>`;
-  return { html, after: () => { const f = $('[data-lrcfg]'); f.onsubmit = e => { e.preventDefault(); if (!canEdit) return; if (!reEmail.test(f.correo.value)) return toast('Correo no válido.', 'err'); if (f.responsable.value.trim().length < 5) return toast('Indique el responsable.', 'err');
+  return { html, after: () => { const f = $('[data-lrcfg]'); f.onsubmit = e => { e.preventDefault(); if (!canEdit) return; if (!reEmail.test(f.correo.value)) return toast('Correo no válido.', 'err'); if (f.responsable.value.trim().length < 2) return toast('Indique el responsable.', 'err');
     Object.assign(c, { responsable: f.responsable.value.trim(), cargo: f.cargo.value.trim(), correo: f.correo.value.trim(), areaInicial: f.areaInicial.value, plazoReclamo: Math.max(1, +f.plazoReclamo.value || 15), plazoQueja: Math.max(1, +f.plazoQueja.value || 15), alerta: Math.max(1, +f.alerta.value || 3), flujo: f.flujo.value.trim() });
     DB.config.correoReclamos = c.correo; audit('Configuración', 'Libro de reclamaciones', 'Responsable y plazos'); if (saveDB()) { toast('Configuración guardada.', 'ok'); route(); } }; } };
 }

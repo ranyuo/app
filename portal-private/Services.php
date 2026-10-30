@@ -17,6 +17,7 @@ final class PortalServices
             if((!empty($r['anulado'])&&!($before['anulado']??false))||(!empty($r['deleted'])&&!($before['deleted']??false))){if($user['rol']!=='admin')throw new PortalError(403,'Solo el administrador puede anular o eliminar registros.');if(!empty($r['anulado'])&&strlen(trim($r['motivoAnulacion']??''))<5)throw new PortalError(422,'Registra el motivo de anulación.');$r['anuladoPor']=$user['usuario'];}
             if($collection==='reclamos'&&($r['estado']??'')==='Atendido'&&strlen(trim($r['respuesta']??''))<10)throw new PortalError(422,'Registra una respuesta institucional de al menos diez caracteres.');
             if(!empty($r['area'])&&!PortalPolicy::find($new['academico']['areas'],'cod',$r['area']))throw new PortalError(422,'El área de derivación no existe.');
+            if(!empty($r['area'])&&($before['area']??'')!==$r['area']&&!(PortalPolicy::find($new['academico']['areas'],'cod',$r['area'])['activo']??false))throw new PortalError(422,'Selecciona un área de derivación activa.');
             $provided=$r['historial']??[];$r['historial']=$before['historial']??[];$notes=[];
             foreach($provided as $entry)if(is_array($entry)&&!in_array($entry,$r['historial'],true)&&!empty($entry['nota']))$notes[]=substr((string)$entry['nota'],0,5000);
             $changed=$before['estado']!==$r['estado']||($before['area']??'')!==($r['area']??'')||($before['respuesta']??'')!==($r['respuesta']??'')||($before['anulado']??false)!==($r['anulado']??false);
