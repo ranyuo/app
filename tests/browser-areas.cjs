@@ -1,6 +1,6 @@
 /* Regresión QA-01. Solo servidor local con la base desechable de tests/intranet.php. */
 const{chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const base=process.env.PISCO_BASE_URL||'http://127.0.0.1:8084';assert.ok(['127.0.0.1','localhost'].includes(new URL(base).hostname));
+const base=(process.env.PORTAL_BASE_URL||process.env.PISCO_BASE_URL)||'http://127.0.0.1:8084';assert.ok(['127.0.0.1','localhost'].includes(new URL(base).hostname));
 (async()=>{const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox']});const errors=[],receipts=[];let checks=0;const dir=path.join(__dirname,'.results/areas');fs.mkdirSync(dir,{recursive:true});
 const context=await browser.newContext(),publicContext=await browser.newContext();for(const c of[context,publicContext])await c.route('https://**/*',r=>r.abort());const p=await context.newPage(),q=await publicContext.newPage();for(const x of[p,q])x.on('pageerror',e=>errors.push(e.message));const go=async(x,r)=>{await x.goto(base+'/?qa='+Date.now()+'#/'+r);await x.locator('main').waitFor()};
 try{await go(p,'admin');await p.fill('#lg-u','admin');await p.fill('#lg-p','PruebaIntranet-2026!');await p.locator('[data-login] button[type=submit]').click();await p.waitForFunction(()=>window.PORTAL_BOOTSTRAP?.user?.rol==='admin');

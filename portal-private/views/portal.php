@@ -1584,7 +1584,7 @@ a.db-kpi:hover{transform:translateY(-3px);box-shadow:var(--sh2);border-color:var
 <script src="/assets/vendor/jspdf.plugin.autotable.min.js" defer></script>
 <script src="/assets/vendor/xlsx.full.min.js" defer></script>
 <script src="/assets/vendor/qrcode.min.js" defer></script>
-<style id="pisco-css">
+<style id="portal-css">
 /* ===== Portal Web IES PALPA 2026: módulos del informe N.º 009-2026 ===== */
 .pz-h2{font-size:18px;margin:18px 0 10px;color:var(--hc)}
 .pz-h2row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
@@ -2201,7 +2201,7 @@ function IX_FACTORY(HOST){
    Núcleo: almacenamiento, datos de demostración, utilidades, CRUD,
    documentos (PDF con QR de verificación) y exportaciones (Excel/PDF).
    ===================================================================== */
-const SKEY = "iestp-pisco-sesion";
+const SKEY = "intranet-palpa-sesion";
 const LS = {
   get(k){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : null }catch(e){ return null } },
   set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)) }catch(e){} },
@@ -2309,7 +2309,9 @@ const ICO = {
   globe:_i('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>')
 };
 /* tema claro/oscuro: preferencia del usuario, por defecto la del sistema */
-const TKEY = "iestp-pisco-tema";
+const TKEY = "intranet-palpa-tema";
+// Conserva la preferencia guardada con la clave anterior del portal.
+try { const old = localStorage.getItem("iestp-pisco-tema"); if (old !== null && localStorage.getItem(TKEY) === null) localStorage.setItem(TKEY, old); localStorage.removeItem("iestp-pisco-tema"); localStorage.removeItem("iestp-pisco-sesion"); } catch (e) { }
 const isDark = () => document.documentElement.dataset.mode === "dark";
 const themeBtn = () => `<button class="iconbtn" data-act="theme" aria-label="${isDark() ? "Usar tema claro" : "Usar tema oscuro"}" title="${isDark() ? "Tema claro" : "Tema oscuro"}">${isDark() ? ICO.sun : ICO.moon}</button>`;
 
@@ -7013,8 +7015,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 </script>
 <script>
-/* ==== pisco.js ==== Portal Web IES PALPA 2026 */
-var PISCO_LOGO = "/assets/palpa/footer-logo-cb16952ab8.png";
+/* ==== portal.js ==== Intranet IES PALPA 2026 */
 (function () {
 'use strict';
 /* =========================================================
@@ -8391,14 +8392,8 @@ if (typeof SPECS === 'object' && SPECS.certificados) { const tb = SPECS.certific
 })();
 
 
-/* La identidad y el contenido institucional proceden de PHP/MySQL. */
-window.piscoOficial = function (D) {};
 
 
-/* =========================================================
-   CARGA INSTITUCIONAL 2026 (se cargan al crear la base) e integración final
-   ========================================================= */
-window.piscoSeed = function (D) {};
 /* Integración al terminar de cargar la aplicación */
 document.addEventListener('DOMContentLoaded', async () => {
   try {

@@ -3,17 +3,17 @@ declare(strict_types=1);
 ob_start();require dirname(__DIR__).'/portal-private/bootstrap.php';
 $path=getenv('PORTAL_CONFIG_FILE');if(!$path||!str_ends_with($path,'config.test.php'))throw new RuntimeException('Solo config.test.php.');
 $config=require $path;if(!str_ends_with($config['db_name'],'_test'))throw new RuntimeException('Solo base desechable _test.');
-$app=portal_app();$db=$app->db();foreach(['pisco_audit','pisco_settings','pisco_files','pisco_visits','pisco_schema','pisco_rate_limits','pisco_users','pisco_state'] as $table)$db->exec('DROP TABLE IF EXISTS '.$table);
+$app=portal_app();$db=$app->db();foreach(['intranet_','pisco_'] as $prefix)foreach(['audit','settings','files','visits','schema','rate_limits','users','state','upgrade_backups'] as $table)$db->exec('DROP TABLE IF EXISTS '.$prefix.$table);
 const PASS='PruebaIntranet-2026!';$count=0;
 function ok(bool $v,string $m):void{global $count;if(!$v)throw new RuntimeException($m);$count++;echo "OK $m\n";}
 function denied(int $status,callable $f,string $m):void{try{$f();}catch(PortalError $e){ok($e->status===$status,$m);return;}throw new RuntimeException($m);}
 function change(callable $f):void{global $app;$b=$app->bootstrap();$d=$b['data'];$f($d);$app->save(['data'=>$d,'revision'=>$b['revision']]);}
-function actor(string $name):void{global $db;$s=$db->prepare('SELECT id,auth_version FROM pisco_users WHERE username=?');$s->execute([$name]);$u=$s->fetch();if(!$u)throw new RuntimeException('Cuenta ausente');$_SESSION['user_id']=(int)$u['id'];$_SESSION['auth_version']=(int)$u['auth_version'];}
+function actor(string $name):void{global $db;$s=$db->prepare('SELECT id,auth_version FROM intranet_users WHERE username=?');$s->execute([$name]);$u=$s->fetch();if(!$u)throw new RuntimeException('Cuenta ausente');$_SESSION['user_id']=(int)$u['id'];$_SESSION['auth_version']=(int)$u['auth_version'];}
 function proof(string $purpose):array{global $app;$c=$app->challenge(['purpose'=>$purpose]);return ['challenge_id'=>$c['id'],'answer'=>$_SESSION['challenges'][$c['id']]['answer'],'accept'=>true,'declare'=>true];}
 function uuid():string{$h=bin2hex(random_bytes(16));return substr($h,0,8).'-'.substr($h,8,4).'-4'.substr($h,13,3).'-a'.substr($h,17,3).'-'.substr($h,20);}
 $app->install(['install_key'=>$config['install_key'],'username'=>'admin','name'=>'Administrador de pruebas','email'=>'admin@example.test','password'=>PASS]);
 $app->login(['username'=>'admin','password'=>PASS]);ok($app->bootstrap()['scope']['mode']==='intranet','Aplicación identificada como intranet');
-$raw=json_decode($db->query('SELECT data FROM pisco_state WHERE id=1')->fetchColumn(),true);
+$raw=json_decode($db->query('SELECT data FROM intranet_state WHERE id=1')->fetchColumn(),true);
 ok($app->bootstrap()['data']['admisiones']===[]&&$app->bootstrap()['data']['slides']===[],'Catálogos editoriales excluidos del bootstrap incluso del administrador');
 foreach(['noticias','paginas','admisiones','tupa','enlaces'] as $key)denied(403,fn()=>change(function(&$d)use($key){$d[$key][]=['id'=>'intrusion'];}),'Servidor rechaza escritura editorial: '.$key);
 denied(403,fn()=>change(function(&$d){$d['config']['home']['cifras']=[];}),'Servidor rechaza cambios de portada');
@@ -58,6 +58,6 @@ change(function(&$d){$d['academico']['postulaciones'][]=['id'=>9001,'of'=>9001,'
 actor($company['username']);ok(PortalFiles::metadata($app,['fileId'=>$cv['fileId']])['sha256']===hash('sha256',$pdf),'Empresa destinataria accede al CV de su postulante');change(function(&$d){foreach($d['academico']['postulaciones'] as &$p)if($p['id']===9001)$p['estado']='Seleccionado';});ok(true,'Empresa actualiza el seguimiento de la postulación');
 actor('atencion');change(function(&$d){$d['reclamos'][0]['estado']='Atendido';$d['reclamos'][0]['respuesta']='Respuesta institucional de prueba registrada.';$d['expedientes'][0]['estado']='En evaluación';});ok(true,'Personal atiende reclamos y evalúa expedientes');
 $app->logout();$lookup=$app->lookup('certificados',['reference'=>'INTRA-CERT-2026']);ok($lookup['record']['nombres']==='Estudiante de prueba','Constancia modular verificable desde el servicio externo');
-actor('admin');change(function(&$d){$d['config']['inst']['telefono']='056-316056';});$after=json_decode($db->query('SELECT data FROM pisco_state WHERE id=1')->fetchColumn(),true);ok(PortalPolicy::equal($raw['paginas'],$after['paginas'])&&PortalPolicy::equal($raw['admisiones'],$after['admisiones']),'Datos del portal anterior conservados sin cambios');
+actor('admin');change(function(&$d){$d['config']['inst']['telefono']='056-316056';});$after=json_decode($db->query('SELECT data FROM intranet_state WHERE id=1')->fetchColumn(),true);ok(PortalPolicy::equal($raw['paginas'],$after['paginas'])&&PortalPolicy::equal($raw['admisiones'],$after['admisiones']),'Datos del portal anterior conservados sin cambios');
 foreach(['secretaria','coordinador','atencion','directivo','docente','egresado','estudiante'] as $name){$app->logout();$app->login(['username'=>$name,'password'=>PASS]);ok($app->user()['usuario']===$name,'Acceso institucional de '.$name);}
 $app->logout();echo "\n$count comprobaciones de intranet aprobadas.\n";ob_end_flush();

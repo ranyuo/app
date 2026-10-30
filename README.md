@@ -41,20 +41,21 @@ Solo sobre una base desechable terminada en `_test`, con `PORTAL_CONFIG_FILE` ap
 ```sh
 PORTAL_CONFIG_FILE=/ruta/config.test.php php tests/intranet.php
 PORTAL_CONFIG_FILE=/ruta/config.test.php php -S 127.0.0.1:8084 -t public_html
-PISCO_BASE_URL=http://127.0.0.1:8084 node tests/browser-intranet.cjs
+PORTAL_BASE_URL=http://127.0.0.1:8084 node tests/browser-intranet.cjs
 ```
 
 Las pruebas web requieren Playwright y Chromium externos; `CHROMIUM_PATH` indica el ejecutable (por defecto, `/usr/bin/chromium`). El servidor debe usar la misma base que la prueba PHP. En este entorno se dispone de los contenedores `app-php` y `app-db`, configuración privada en `/workspace/app-dev/config.test.php`, base `app_test` y Playwright en `/workspace/nasca-dev/tools/node_modules`.
 
 ```sh
 docker exec -w /workspace/app app-php php tests/intranet.php
-NODE_PATH=/workspace/nasca-dev/tools/node_modules PISCO_BASE_URL=http://127.0.0.1:8084 node tests/browser-intranet.cjs
+NODE_PATH=/workspace/nasca-dev/tools/node_modules PORTAL_BASE_URL=http://127.0.0.1:8084 node tests/browser-intranet.cjs
 docker exec -w /workspace/app app-php php tests/area-compatibility.php
-NODE_PATH=/workspace/nasca-dev/tools/node_modules PISCO_BASE_URL=http://127.0.0.1:8084 node tests/browser-areas.cjs
+NODE_PATH=/workspace/nasca-dev/tools/node_modules PORTAL_BASE_URL=http://127.0.0.1:8084 node tests/browser-areas.cjs
 docker exec -w /workspace/app app-php php tests/inactive-routing.php
+docker exec -w /workspace/app app-php php tests/legacy-migration.php
 ```
 
-Se retiraron los informes, paquetes y suites históricas del portal completo; se conservan las cinco pruebas vigentes de esta intranet. Las pruebas actuales evalúan el alcance reducido, los permisos y los recorridos conservados. El correo saliente y la carga de información académica real siguen pendientes de configuración institucional.
+Se retiraron los informes, paquetes y suites históricas del portal completo; se conservan las seis pruebas vigentes de esta intranet. `tests/legacy-migration.php` comprueba el paso de las tablas heredadas `pisco_*` a `intranet_*` y la restauración de respaldos `.piscobak`. Las pruebas actuales evalúan el alcance reducido, los permisos y los recorridos conservados. El correo saliente y la carga de información académica real siguen pendientes de configuración institucional.
 
 ## Paquete para Hostinger
 
@@ -66,6 +67,6 @@ python3 scripts/package-hostinger.py /ruta/fuera-del-repositorio/intranet-palpa-
 
 El empaquetador incluye solo archivos versionados necesarios para la instalación, los recursos activos de Palpa, las bibliotecas y las instrucciones. Excluye configuraciones privadas, respaldos, pruebas y recursos históricos ajenos a la instalación nueva. Añade versión y hashes de integridad.
 
-Para aplicar las correcciones del QA a una instalación existente, consulta [ACTUALIZACION-QA-HOSTINGER.md](ACTUALIZACION-QA-HOSTINGER.md); para las mejoras posteriores al plan de pruebas, [ACTUALIZACION-MEJORAS.md](ACTUALIZACION-MEJORAS.md). El resultado verificado y sus límites están en [QA-CORRECCIONES-INTRANET.md](QA-CORRECCIONES-INTRANET.md).
+Para aplicar las correcciones del QA a una instalación existente, consulta [ACTUALIZACION-QA-HOSTINGER.md](ACTUALIZACION-QA-HOSTINGER.md); para las mejoras posteriores al plan de pruebas y el cambio de nombres internos, [ACTUALIZACION-MEJORAS.md](ACTUALIZACION-MEJORAS.md). El resultado verificado y sus límites están en [QA-CORRECCIONES-INTRANET.md](QA-CORRECCIONES-INTRANET.md).
 
 La limpieza de archivos y las mediciones de tamaño se documentan en [LIMPIEZA-REPOSITORIO.md](LIMPIEZA-REPOSITORIO.md).
