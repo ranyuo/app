@@ -12,8 +12,8 @@ try {
         $app->checkCsrf(is_string($_POST['_csrf'] ?? null) ? $_POST['_csrf'] : '');
         $window = intdiv(time(), 300) * 300;
         $rateKey = hash('sha256', 'owner-recovery|'.($_SERVER['REMOTE_ADDR'] ?? 'local').'|'.$window);
-        $app->db()->prepare('INSERT INTO pisco_rate_limits (rate_key,hits,expires_at) VALUES (?,1,?) ON DUPLICATE KEY UPDATE hits = hits + 1')->execute([$rateKey, $window + 300]);
-        $statement = $app->db()->prepare('SELECT hits FROM pisco_rate_limits WHERE rate_key = ?');
+        $app->db()->prepare('INSERT INTO intranet_rate_limits (rate_key,hits,expires_at) VALUES (?,1,?) ON DUPLICATE KEY UPDATE hits = hits + 1')->execute([$rateKey, $window + 300]);
+        $statement = $app->db()->prepare('SELECT hits FROM intranet_rate_limits WHERE rate_key = ?');
         $statement->execute([$rateKey]);
         if ((int)$statement->fetchColumn() > 5) throw new PortalError(429, 'Demasiados intentos. Espera cinco minutos.');
         if (($_POST['action'] ?? '') === 'authorize') {
@@ -32,15 +32,15 @@ try {
             || preg_match_all('/./us', $password) < 12 || strlen($password) > 72) {
             throw new PortalError(422, 'Elige una cuenta y una contraseña de al menos 12 caracteres y máximo 72 bytes. Las dos contraseñas deben coincidir.');
         }
-        $statement = $app->db()->prepare('SELECT username FROM pisco_users WHERE id = ? AND active = 1');
+        $statement = $app->db()->prepare('SELECT username FROM intranet_users WHERE id = ? AND active = 1');
         $statement->execute([$id]);
         $username = $statement->fetchColumn();
         if ($username === false) throw new PortalError(422, 'La cuenta seleccionada no está activa.');
-        $columns=$app->db()->query('SHOW COLUMNS FROM pisco_users')->fetchAll(PDO::FETCH_COLUMN);
+        $columns=$app->db()->query('SHOW COLUMNS FROM intranet_users')->fetchAll(PDO::FETCH_COLUMN);
         $extra=in_array('auth_version',$columns,true)?', auth_version = auth_version + 1, login_failures = 0, locked_until = NULL':'';
-        $app->db()->prepare('UPDATE pisco_users SET password = ?'.$extra.' WHERE id = ? AND active = 1')->execute([password_hash($password, PASSWORD_DEFAULT), $id]);
+        $app->db()->prepare('UPDATE intranet_users SET password = ?'.$extra.' WHERE id = ? AND active = 1')->execute([password_hash($password, PASSWORD_DEFAULT), $id]);
         $loginKey = hash('sha256', 'login:'.$username.'|'.($_SERVER['REMOTE_ADDR'] ?? 'local').'|'.$window);
-        $app->db()->prepare('DELETE FROM pisco_rate_limits WHERE rate_key = ?')->execute([$loginKey]);
+        $app->db()->prepare('DELETE FROM intranet_rate_limits WHERE rate_key = ?')->execute([$loginKey]);
         unset($_SESSION['owner_recovery_until'], $_SESSION['user_id']);
         session_regenerate_id(true);
         $_SESSION['csrf'] = bin2hex(random_bytes(32));
@@ -53,7 +53,7 @@ try {
 }
 $authorized = isset($app) && ($_SESSION['owner_recovery_until'] ?? 0) > time();
 if ($authorized) {
-    try { $users = $app->db()->query('SELECT id,username,name FROM pisco_users WHERE active = 1 ORDER BY username')->fetchAll(); }
+    try { $users = $app->db()->query('SELECT id,username,name FROM intranet_users WHERE active = 1 ORDER BY username')->fetchAll(); }
     catch (Throwable $exception) { portal_error($exception); }
 }
 function e(string $value): string { return htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); }

@@ -13,7 +13,7 @@ final class PortalFiles
         $mime=(new finfo(FILEINFO_MIME_TYPE))->buffer($bytes);$ext=strtolower(pathinfo($name,PATHINFO_EXTENSION));
         if(!isset(self::TYPES[$mime])||!in_array($ext,self::TYPES[$mime],true))throw new PortalError(422,'El contenido del archivo no coincide con un formato permitido.');
         $id=bin2hex(random_bytes(16));$user=$app->user();$sha=hash('sha256',$bytes);
-        $app->db()->prepare('INSERT INTO pisco_files (id,owner_user_id,owner_session,filename,mime,size,sha256,contents) VALUES (?,?,?,?,?,?,?,?)')->execute([$id,$user['server_id']??null,hash('sha256',session_id()),$name,$mime,strlen($bytes),$sha,$bytes]);
+        $app->db()->prepare('INSERT INTO intranet_files (id,owner_user_id,owner_session,filename,mime,size,sha256,contents) VALUES (?,?,?,?,?,?,?,?)')->execute([$id,$user['server_id']??null,hash('sha256',session_id()),$name,$mime,strlen($bytes),$sha,$bytes]);
         return ['fileId'=>$id,'url'=>'/index.php?route=api%2Farchivo&id='.$id,'original'=>$name,'nombre'=>$name,'n'=>$name,'size'=>strlen($bytes),'s'=>strlen($bytes),'type'=>$mime,'sha256'=>$sha];
     }
     public static function contains(mixed $value,string $id): bool
@@ -26,7 +26,7 @@ final class PortalFiles
     public static function metadata(PortalApp $app,array $file,bool $ownerOnly=false): array
     {
         $id=$file['fileId']??'';if(!is_string($id)||!preg_match('/^[a-f0-9]{32}$/',$id))throw new PortalError(422,'Referencia de archivo no válida.');
-        $stmt=$app->db()->prepare('SELECT id,owner_user_id,owner_session,filename,mime,size,sha256 FROM pisco_files WHERE id=?');$stmt->execute([$id]);$row=$stmt->fetch();if(!$row)throw new PortalError(404,'Archivo no encontrado en el servidor.');
+        $stmt=$app->db()->prepare('SELECT id,owner_user_id,owner_session,filename,mime,size,sha256 FROM intranet_files WHERE id=?');$stmt->execute([$id]);$row=$stmt->fetch();if(!$row)throw new PortalError(404,'Archivo no encontrado en el servidor.');
         $user=$app->user();$owned=$row['owner_user_id']!==null?($user&&(int)$row['owner_user_id']===$user['server_id']):hash_equals($row['owner_session'],hash('sha256',session_id()));
         if(!$owned&&($ownerOnly||!self::contains($app->bootstrap()['data'],$id)))throw new PortalError(403,'No tienes acceso a ese archivo.');
         return ['fileId'=>$id,'url'=>'/index.php?route=api%2Farchivo&id='.$id,'nombre'=>$row['filename'],'original'=>$row['filename'],'n'=>$row['filename'],'size'=>(int)$row['size'],'s'=>(int)$row['size'],'type'=>$row['mime'],'sha256'=>$row['sha256']];
@@ -52,7 +52,7 @@ final class PortalFiles
     }
     public static function serve(PortalApp $app,string $id): never
     {
-        $meta=self::metadata($app,['fileId'=>$id]);$stmt=$app->db()->prepare('SELECT contents FROM pisco_files WHERE id=?');$stmt->execute([$id]);$data=$stmt->fetchColumn();
+        $meta=self::metadata($app,['fileId'=>$id]);$stmt=$app->db()->prepare('SELECT contents FROM intranet_files WHERE id=?');$stmt->execute([$id]);$data=$stmt->fetchColumn();
         header('Content-Type: '.$meta['type']);header('Content-Length: '.$meta['size']);
         $disposition=isset($_GET['download'])||!in_array($meta['type'],['application/pdf','image/png','image/jpeg','image/webp','image/gif'],true)?'attachment':'inline';
         header('Content-Disposition: '.$disposition."; filename*=UTF-8''".rawurlencode($meta['original']));

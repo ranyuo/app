@@ -11,11 +11,11 @@ try{
         if(isset($_POST['import_palpa']))throw new PortalError(403,'La intranet no reemplaza el contenido de la web institucional.');
         $lock=fopen(dirname(__DIR__).'/portal-private/upgrade.lock','c+');if(!$lock||!flock($lock,LOCK_EX))throw new PortalError(503,'No se pudo proteger la actualización.');
         try{
-            $db=$app->db();$state=$db->query('SELECT data,revision FROM pisco_state WHERE id=1')->fetch();
+            $db=$app->db();$state=$db->query('SELECT data,revision FROM intranet_state WHERE id=1')->fetch();
             if(!$state)throw new PortalError(422,'Primero debe existir una instalación del portal.');
-            $db->exec('CREATE TABLE IF NOT EXISTS pisco_upgrade_backups (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,state_data LONGTEXT NOT NULL,accounts_data LONGTEXT NOT NULL) ENGINE=InnoDB');
-            $accounts=$db->query('SELECT * FROM pisco_users')->fetchAll();
-            $db->prepare('INSERT INTO pisco_upgrade_backups (state_data,accounts_data) VALUES (?,?)')->execute([$state['data'],json_encode($accounts,JSON_THROW_ON_ERROR)]);
+            $db->exec('CREATE TABLE IF NOT EXISTS intranet_upgrade_backups (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,state_data LONGTEXT NOT NULL,accounts_data LONGTEXT NOT NULL) ENGINE=InnoDB');
+            $accounts=$db->query('SELECT * FROM intranet_users')->fetchAll();
+            $db->prepare('INSERT INTO intranet_upgrade_backups (state_data,accounts_data) VALUES (?,?)')->execute([$state['data'],json_encode($accounts,JSON_THROW_ON_ERROR)]);
             PortalSchema::apply($db);
             $done=true;
         }finally{flock($lock,LOCK_UN);fclose($lock);}

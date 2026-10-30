@@ -30,7 +30,7 @@ for name in filter(None, tracked):
     if name in {'portal-private/NascaContent.php', 'portal-private/PalpaContent.php',
                 'portal-private/data/chincha-sources.json', 'portal-private/data/nasca-sources.json'}:
         continue
-    if path.name != 'config.example.php' and (path.name.startswith('config.') or path.suffix in {'.log', '.lock', '.env', '.piscobak'}):
+    if path.name != 'config.example.php' and (path.name.startswith('config.') or path.suffix in {'.log', '.lock', '.env', '.intranetbak', '.piscobak'}):
         raise SystemExit(f'Archivo privado inesperado entre los versionados: {name}')
     if any(part in {'backups', '.backups', '.results', '.git'} for part in path.parts):
         raise SystemExit(f'Ruta privada inesperada: {name}')

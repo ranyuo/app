@@ -11,10 +11,10 @@ try{
         PortalAudit::write($app,'Exportar auditoría','Auditoría','',['filtro'=>$q]);
         header('Content-Type: text/csv; charset=utf-8');header('Content-Disposition: attachment; filename="auditoria-'.date('Ymd-His').'.csv"');$out=fopen('php://output','wb');fwrite($out,"\xEF\xBB\xBF");fputcsv($out,['Fecha','Usuario','Rol','Acción','Entidad','Registro','Detalle'],';','"','');
         $last=PHP_INT_MAX;
-        do{$stmt=$app->db()->prepare('SELECT * FROM pisco_audit'.$condition.($condition?' AND ':' WHERE ').'id < ? ORDER BY id DESC LIMIT 500');$stmt->execute([...$args,$last]);$batch=$stmt->fetchAll();foreach($batch as $r){$last=(int)$r['id'];$values=[$r['occurred_at'],$r['username'],$r['role'],$r['action'],$r['entity'],$r['record_key'],$r['details']];$values=array_map(fn($v)=>preg_match('/^[=+@\t\r-]/',(string)$v)?"'".$v:$v,$values);fputcsv($out,$values,';','"','');}}while(count($batch)===500);fclose($out);exit;
+        do{$stmt=$app->db()->prepare('SELECT * FROM intranet_audit'.$condition.($condition?' AND ':' WHERE ').'id < ? ORDER BY id DESC LIMIT 500');$stmt->execute([...$args,$last]);$batch=$stmt->fetchAll();foreach($batch as $r){$last=(int)$r['id'];$values=[$r['occurred_at'],$r['username'],$r['role'],$r['action'],$r['entity'],$r['record_key'],$r['details']];$values=array_map(fn($v)=>preg_match('/^[=+@\t\r-]/',(string)$v)?"'".$v:$v,$values);fputcsv($out,$values,';','"','');}}while(count($batch)===500);fclose($out);exit;
     }
-    $count=$app->db()->prepare('SELECT COUNT(*) FROM pisco_audit'.$condition);$count->execute($args);$total=(int)$count->fetchColumn();$pages=max(1,(int)ceil($total/100));$page=max(1,min($pages,(int)($_GET['page']??1)));
-    $stmt=$app->db()->prepare('SELECT * FROM pisco_audit'.$condition.' ORDER BY id DESC LIMIT 100 OFFSET '.(($page-1)*100));$stmt->execute($args);$rows=$stmt->fetchAll();
+    $count=$app->db()->prepare('SELECT COUNT(*) FROM intranet_audit'.$condition);$count->execute($args);$total=(int)$count->fetchColumn();$pages=max(1,(int)ceil($total/100));$page=max(1,min($pages,(int)($_GET['page']??1)));
+    $stmt=$app->db()->prepare('SELECT * FROM intranet_audit'.$condition.' ORDER BY id DESC LIMIT 100 OFFSET '.(($page-1)*100));$stmt->execute($args);$rows=$stmt->fetchAll();
 }catch(Throwable $e){portal_error($e);}
 function e(string $v):string{return htmlspecialchars($v,ENT_QUOTES,'UTF-8');}
 function linkTo(array $patch):string{return '?'.http_build_query([...$_GET,...$patch]);}

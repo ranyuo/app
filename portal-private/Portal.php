@@ -68,10 +68,16 @@ final class PortalApp
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
             );
-            try {
-                $roles=$this->connection->query("SELECT setting_value FROM pisco_settings WHERE setting_key='role_permissions'")->fetchColumn();
+            $loadRoles=function(){
+                $roles=$this->connection->query("SELECT setting_value FROM intranet_settings WHERE setting_key='role_permissions'")->fetchColumn();
                 PortalPolicy::configureRoles($roles?json_decode($roles,true,flags:JSON_THROW_ON_ERROR):[]);
-            } catch(PDOException $error) { if($error->getCode()!=='42S02')throw $error;PortalPolicy::configureRoles([]); }
+            };
+            try { $loadRoles(); } catch(PDOException $error) {
+                if($error->getCode()!=='42S02')throw $error;
+                // Las instalaciones anteriores usan tablas pisco_*; se renombran en la primera conexión.
+                try { if(!PortalSchema::migrateLegacyTables($this->connection))throw $error;$loadRoles(); }
+                catch(PDOException $retry) { if($retry->getCode()!=='42S02')throw $retry;PortalPolicy::configureRoles([]); }
+            }
         }
         return $this->connection;
     }
@@ -136,7 +142,7 @@ final class PortalApp
     public function bootstrap(): array
     {
         $state=$this->state();$full=json_decode($state['data'],true,flags:JSON_THROW_ON_ERROR);$user=$this->user();
-        try{$full['visitas']=$this->db()->query('SELECT visit_day,views FROM pisco_visits')->fetchAll(PDO::FETCH_KEY_PAIR);}catch(PDOException $e){if($e->getCode()!=='42S02')throw $e;$full['visitas']=[];}
+        try{$full['visitas']=$this->db()->query('SELECT visit_day,views FROM intranet_visits')->fetchAll(PDO::FETCH_KEY_PAIR);}catch(PDOException $e){if($e->getCode()!=='42S02')throw $e;$full['visitas']=[];}
         $data=IntranetScope::project(PortalPolicy::project($full,$user,$this->publicData($full)));
         $data['usuarios']=$this->visibleAccounts($user,$full);
         if($user&&$user['rol']==='admin'){$data['auditoria']=[...PortalAudit::rows($this),...PortalAudit::legacy($this,$full)];$data['academico']['bitacora']=array_map(fn($r)=>['id'=>$r['id'],'f'=>$r['fecha'],'u'=>$r['usuario'],'a'=>$r['accion'],'m'=>$r['entidad'],'d'=>$r['registro'].' · '.$r['detalle']],PortalAudit::rows($this));}
@@ -168,7 +174,7 @@ final class PortalApp
     {
         if(empty($_SESSION['user_id']))return null;
         if(!isset($_SESSION['auth_version'])){unset($_SESSION['user_id']);return null;}
-        $statement=$this->db()->prepare('SELECT * FROM pisco_users WHERE id=? AND active=1');$statement->execute([$_SESSION['user_id']]);$user=$statement->fetch();
+        $statement=$this->db()->prepare('SELECT * FROM intranet_users WHERE id=? AND active=1');$statement->execute([$_SESSION['user_id']]);$user=$statement->fetch();
         if(!$user){unset($_SESSION['user_id']);return null;}
         if(isset($_SESSION['auth_version'])&&(int)$_SESSION['auth_version']!==(int)($user['auth_version']??1)){unset($_SESSION['user_id'],$_SESSION['auth_version']);return null;}
         $_SESSION['auth_version']=(int)($user['auth_version']??1);return $this->accountDto($user);
@@ -180,7 +186,7 @@ final class PortalApp
     }
     private function state(bool $lock = false): array
     {
-        $state = $this->db()->query('SELECT data, revision FROM pisco_state WHERE id = 1'.($lock ? ' FOR UPDATE' : ''))->fetch();
+        $state = $this->db()->query('SELECT data, revision FROM intranet_state WHERE id = 1'.($lock ? ' FOR UPDATE' : ''))->fetch();
         if (!$state) throw new PortalError(503, 'Completa la instalación en /install.php.');
         $state['data']=json_encode($this->normalizeDates(json_decode($state['data'],true,flags:JSON_THROW_ON_ERROR)),JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE);
         return $state;
@@ -210,7 +216,7 @@ final class PortalApp
 
     private function updateState(array $data, int $revision): void
     {
-        $statement = $this->db()->prepare('UPDATE pisco_state SET data = ?, revision = ? WHERE id = 1');
+        $statement = $this->db()->prepare('UPDATE intranet_state SET data = ?, revision = ? WHERE id = 1');
         $statement->execute([json_encode($this->normalizeDates($data), JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE), $revision]);
     }
 
@@ -218,16 +224,16 @@ final class PortalApp
     {
         $window = intdiv(time(), $seconds) * $seconds;
         $key = hash('sha256', $action.'|'.($_SERVER['REMOTE_ADDR'] ?? 'local').'|'.$window);
-        $statement = $this->db()->prepare('INSERT INTO pisco_rate_limits (rate_key,hits,expires_at) VALUES (?,1,?) ON DUPLICATE KEY UPDATE hits = hits + 1');
+        $statement = $this->db()->prepare('INSERT INTO intranet_rate_limits (rate_key,hits,expires_at) VALUES (?,1,?) ON DUPLICATE KEY UPDATE hits = hits + 1');
         $statement->execute([$key, $window + $seconds]);
-        $statement = $this->db()->prepare('SELECT hits FROM pisco_rate_limits WHERE rate_key = ?');
+        $statement = $this->db()->prepare('SELECT hits FROM intranet_rate_limits WHERE rate_key = ?');
         $statement->execute([$key]);
         if ((int)$statement->fetchColumn() > $limit) {
             header('Retry-After: '.max(1, $window + $seconds - time()));
             throw new PortalError(429, 'Demasiados intentos. Espera unos minutos antes de continuar.');
         }
         if (random_int(1, 100) === 1) {
-            $statement = $this->db()->prepare('DELETE FROM pisco_rate_limits WHERE expires_at < ? LIMIT 1000');
+            $statement = $this->db()->prepare('DELETE FROM intranet_rate_limits WHERE expires_at < ? LIMIT 1000');
             $statement->execute([time()]);
         }
     }
@@ -238,18 +244,18 @@ final class PortalApp
         $this->rate('login',60,60);
         $db=$this->db();$db->beginTransaction();
         try{
-            $stmt=$db->prepare('SELECT * FROM pisco_users WHERE username=? AND active=1 FOR UPDATE');$stmt->execute([$username]);$row=$stmt->fetch();
+            $stmt=$db->prepare('SELECT * FROM intranet_users WHERE username=? AND active=1 FOR UPDATE');$stmt->execute([$username]);$row=$stmt->fetch();
             if($row&&!empty($row['locked_until'])&&strtotime($row['locked_until'])>time()){$db->commit();throw new PortalError(423,'Cuenta bloqueada por intentos fallidos. Espera cinco minutos o solicita el desbloqueo.');}
             $ok=password_verify($input['password'],$row['password']??'$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.');
             if(isset($input['role'])&&(!is_string($input['role'])||$input['role']!==($row['role']??'')))$ok=false;
             if(!$row||!$ok){
                 if($row){$failures=(int)($row['login_failures']??0)+1;$locked=$failures>=5?date('Y-m-d H:i:s',time()+300):null;
-                    $db->prepare('UPDATE pisco_users SET login_failures=?,locked_until=? WHERE id=?')->execute([$locked?0:$failures,$locked,$row['id']]);}
+                    $db->prepare('UPDATE intranet_users SET login_failures=?,locked_until=? WHERE id=?')->execute([$locked?0:$failures,$locked,$row['id']]);}
                 PortalAudit::write($this,'Intento de acceso fallido','Cuentas',$username,['bloqueada'=>isset($locked)&&$locked?'sí':'no'],['usuario'=>'visitante','rol'=>'publico']);
                 $db->commit();throw new PortalError(422,'Usuario o contraseña incorrectos.');
             }
-            if(password_needs_rehash($row['password'],PASSWORD_DEFAULT))$db->prepare('UPDATE pisco_users SET password=? WHERE id=?')->execute([password_hash($input['password'],PASSWORD_DEFAULT),$row['id']]);
-            $db->prepare('UPDATE pisco_users SET login_failures=0,locked_until=NULL,last_login=? WHERE id=?')->execute([date('Y-m-d H:i:s'),$row['id']]);$db->commit();
+            if(password_needs_rehash($row['password'],PASSWORD_DEFAULT))$db->prepare('UPDATE intranet_users SET password=? WHERE id=?')->execute([password_hash($input['password'],PASSWORD_DEFAULT),$row['id']]);
+            $db->prepare('UPDATE intranet_users SET login_failures=0,locked_until=NULL,last_login=? WHERE id=?')->execute([date('Y-m-d H:i:s'),$row['id']]);$db->commit();
         }catch(Throwable $e){if($db->inTransaction())$db->rollBack();throw $e;}
         PortalAudit::write($this,'Iniciar sesión','Cuentas',(string)$row['id'],[], $this->accountDto($row));
         session_regenerate_id(true);$_SESSION['user_id']=(int)$row['id'];$_SESSION['auth_version']=(int)($row['auth_version']??1);$_SESSION['csrf']=bin2hex(random_bytes(32));return ['ok'=>true];
@@ -283,7 +289,7 @@ final class PortalApp
             PortalServices::apply($previous,$data,$user);PortalRules::apply($previous,$data,$user);PortalRules::catalogs($data);
             PortalAcademic::validate($previous,$data);
             PortalDomain::validate($previous,$data,$user);PortalDomain::syncCertificates($data);$this->validateBindings($data);
-            $allAccounts=array_map($this->accountDto(...),$this->db()->query('SELECT * FROM pisco_users')->fetchAll());
+            $allAccounts=array_map($this->accountDto(...),$this->db()->query('SELECT * FROM intranet_users')->fetchAll());
             PortalDomain::notifications($previous,$data,$allAccounts);
             $data['usuarios']=[];$data['__v']=13;$data['visitas']=$previous['visitas']??[];
             $changed=[];foreach($data as $key=>$value)if(!PortalPolicy::equal($value,$previous[$key]??null))$changed[]=$key;
@@ -304,7 +310,7 @@ final class PortalApp
         if(time()-$seen<10)return ['ok'=>true];
         if(count($_SESSION['page_views']??[])>100)$_SESSION['page_views']=[];
         $_SESSION['page_views'][$path]=time();
-        $this->db()->prepare('INSERT INTO pisco_visits (visit_day,views) VALUES (?,1) ON DUPLICATE KEY UPDATE views=views+1')->execute([date('Y-m-d')]);
+        $this->db()->prepare('INSERT INTO intranet_visits (visit_day,views) VALUES (?,1) ON DUPLICATE KEY UPDATE views=views+1')->execute([date('Y-m-d')]);
         return ['ok'=>true];
     }
     public function upload(): array
@@ -344,7 +350,7 @@ final class PortalApp
     }
     private function validateBindings(array $data): void
     {
-        foreach($this->db()->query('SELECT username,role,profile FROM pisco_users WHERE active=1')->fetchAll() as $row){$p=json_decode($row['profile']??'{}',true)??[];$target=null;
+        foreach($this->db()->query('SELECT username,role,profile FROM intranet_users WHERE active=1')->fetchAll() as $row){$p=json_decode($row['profile']??'{}',true)??[];$target=null;
             if(in_array($row['role'],['estudiante','egresado'],true))$target=PortalPolicy::find($data['academico']['estudiantes'],'id',PortalPolicy::binding($p,'est'));
             elseif($row['role']==='empresa')$target=PortalPolicy::find($data['academico']['empresas'],'id',PortalPolicy::binding($p,'emp'));
             elseif($row['role']==='docente'){$target=PortalPolicy::find($data['academico']['docentes'],'id',PortalPolicy::binding($p,'doc'));$person=PortalPolicy::find($data['personas'],'id',$p['personaId']??'');if(!$person||($person['deleted']??false))$target=null;}
@@ -354,7 +360,7 @@ final class PortalApp
     }
     public function installed(): bool
     {
-        try { return (int)$this->db()->query('SELECT COUNT(*) FROM pisco_users')->fetchColumn() > 0; }
+        try { return (int)$this->db()->query('SELECT COUNT(*) FROM intranet_users')->fetchColumn() > 0; }
         catch (PDOException $error) {
             if ($error->getCode() === '42S02') return false;
             throw $error;
@@ -375,7 +381,7 @@ final class PortalApp
             $this->transaction(function () use ($input) {
                 $seed = file_get_contents(__DIR__.'/data/portal.json');
                 json_decode($seed, true, flags: JSON_THROW_ON_ERROR);
-                $this->db()->prepare('INSERT INTO pisco_state (id,data,revision) VALUES (1,?,1) ON DUPLICATE KEY UPDATE id = id')->execute([$seed]);
+                $this->db()->prepare('INSERT INTO intranet_state (id,data,revision) VALUES (1,?,1) ON DUPLICATE KEY UPDATE id = id')->execute([$seed]);
                 $this->createAccount($input, false);
                 return [];
             });
